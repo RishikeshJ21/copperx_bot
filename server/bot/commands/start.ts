@@ -1,40 +1,57 @@
-import { Telegraf, Markup } from 'telegraf';
-import { createMainMenuButtons } from '../utils/markup';
+import { Telegraf } from 'telegraf';
+import { createLoginButtons } from '../utils/markup';
+import { config } from '../config';
+import { storage } from '../../storage';
+import { CopperxContext } from '../models';
 
 export function registerStartCommand(bot: Telegraf) {
+  // Handle /start command
   bot.command('start', async (ctx) => {
-    const firstName = ctx.from.first_name || 'there';
-    
-    const welcomeMessage = `
-*Welcome to Copperx Payout Bot!* 👋
-
-Hi ${firstName}, I'm your personal assistant for managing your stablecoin finances directly through Telegram.
-
-With me, you can:
-• Check wallet balances
-• Send funds to emails or wallet addresses
-• Withdraw to external wallets or bank accounts
-• View transaction history
-• Check KYC status
-• Generate deposit addresses
-
-*To get started*, please use /login to authenticate with your Copperx account.
-
-Need help? Type /help to see all available commands.
-`;
-
-    await ctx.reply(welcomeMessage, {
-      parse_mode: 'Markdown',
-      ...Markup.keyboard([
-        ['💰 Balance', '👛 Wallets'],
-        ['📤 Send', '📥 Deposit'],
-        ['📋 History', '🔑 Login'],
-        ['❓ Help']
-      ]).resize()
-    });
+    try {
+      const telegramId = ctx.from?.id.toString();
+      
+      if (!telegramId) {
+        return;
+      }
+      
+      // Get user from storage
+      let user = await storage.getUser(telegramId);
+      
+      // Create new user if not exists
+      if (!user) {
+        user = await storage.createUser({
+          telegramId,
+          firstName: ctx.from?.first_name || null,
+          lastName: ctx.from?.last_name || null,
+          username: ctx.from?.username || null,
+          email: null
+        });
+      }
+      
+      // Send welcome message
+      await ctx.replyWithMarkdown(
+        config.messages.welcome,
+        createLoginButtons()
+      );
+      
+      // Reset any ongoing flow states
+      if ((ctx as CopperxContext).session) {
+        if ((ctx as CopperxContext).session.login) {
+          (ctx as CopperxContext).session.login = undefined;
+        }
+        if ((ctx as CopperxContext).session.send) {
+          (ctx as CopperxContext).session.send = undefined;
+        }
+        if ((ctx as CopperxContext).session.withdraw) {
+          (ctx as CopperxContext).session.withdraw = undefined;
+        }
+        
+        // Save the session
+        await (ctx as CopperxContext).saveSession();
+      }
+    } catch (error) {
+      console.error('Error in start command:', error);
+      await ctx.reply('Sorry, there was an error starting the bot. Please try again.');
+    }
   });
-
-  // Handle text-based menu buttons
-  bot.hears('❓ Help', (ctx) => ctx.command.help());
-  bot.hears('🔑 Login', (ctx) => ctx.command.login());
 }
