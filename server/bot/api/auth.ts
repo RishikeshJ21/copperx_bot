@@ -10,10 +10,10 @@ export async function requestEmailOTP(email: string): Promise<EmailOtpRequestRes
   try {
     return await apiRequest<EmailOtpRequestResponse>({
       method: 'POST',
-      url: '/auth/email/request',
+      url: '/api/auth/email-otp/request',
       data: { email },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to request email OTP:', error);
     throw new Error(`Failed to send verification code: ${error.message}`);
   }
@@ -34,10 +34,10 @@ export async function verifyEmailOTP(
   try {
     return await apiRequest<EmailOtpVerifyResponse>({
       method: 'POST',
-      url: '/auth/email/verify',
+      url: '/api/auth/email-otp/authenticate',
       data: { email, otp, sid },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to verify email OTP:', error);
     throw new Error(`Failed to verify code: ${error.message}`);
   }
@@ -52,10 +52,10 @@ export async function getUserProfile(accessToken: string): Promise<UserData> {
   try {
     return await apiRequest<UserData>({
       method: 'GET',
-      url: '/user/profile',
+      url: '/api/auth/me',
       accessToken,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to get user profile:', error);
     throw new Error(`Failed to retrieve profile: ${error.message}`);
   }
@@ -68,13 +68,13 @@ export async function getUserProfile(accessToken: string): Promise<UserData> {
  */
 export async function logout(accessToken: string): Promise<boolean> {
   try {
-    await apiRequest<{ success: boolean }>({
+    await apiRequest<{ message: string, statusCode: number }>({
       method: 'POST',
-      url: '/auth/logout',
+      url: '/api/auth/logout',
       accessToken,
     });
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to logout:', error);
     return false;
   }
@@ -89,12 +89,12 @@ export async function logout(accessToken: string): Promise<boolean> {
 export async function updateUserFlag(accessToken: string, flag: string): Promise<UserData> {
   try {
     return await apiRequest<UserData>({
-      method: 'PATCH',
-      url: '/user/flags',
-      data: { flag, value: true },
+      method: 'PUT',
+      url: '/api/auth/flags',
+      data: { flag },
       accessToken,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to update user flag:', error);
     throw new Error(`Failed to update preferences: ${error.message}`);
   }

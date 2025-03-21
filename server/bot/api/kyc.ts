@@ -14,11 +14,16 @@ import {
  * @returns KYC status object
  */
 export async function getKycStatus(accessToken: string, email: string) {
-  return apiRequest<KycStatusResponse>({
-    method: 'GET',
-    url: `/api/kycs/status/${email}`,
-    accessToken
-  });
+  try {
+    return await apiRequest<KycStatusResponse>({
+      method: 'GET',
+      url: `/api/kycs/status`,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get KYC status:', error);
+    throw new Error(`Failed to retrieve KYC status: ${error.message}`);
+  }
 }
 
 /**
@@ -27,13 +32,18 @@ export async function getKycStatus(accessToken: string, email: string) {
  * @returns List of available payment providers
  */
 export async function getPaymentProviders(accessToken: string) {
-  const response = await apiRequest<{ items: PaymentProvider[] }>({
-    method: 'GET',
-    url: '/api/kycs/providers',
-    accessToken
-  });
-  
-  return response.items || [];
+  try {
+    const response = await apiRequest<{ items: PaymentProvider[] }>({
+      method: 'GET',
+      url: '/api/kycs/providers',
+      accessToken
+    });
+    
+    return response.items || [];
+  } catch (error: any) {
+    console.error('Failed to get payment providers:', error);
+    throw new Error(`Failed to retrieve payment providers: ${error.message}`);
+  }
 }
 
 /**
@@ -42,13 +52,18 @@ export async function getPaymentProviders(accessToken: string) {
  * @returns List of available payment routes
  */
 export async function getPaymentRoutes(accessToken: string) {
-  const response = await apiRequest<{ items: PaymentRoute[] }>({
-    method: 'GET',
-    url: '/api/kycs/routes',
-    accessToken
-  });
-  
-  return response.items || [];
+  try {
+    const response = await apiRequest<{ items: PaymentRoute[] }>({
+      method: 'GET',
+      url: '/api/kycs/routes',
+      accessToken
+    });
+    
+    return response.items || [];
+  } catch (error: any) {
+    console.error('Failed to get payment routes:', error);
+    throw new Error(`Failed to retrieve payment routes: ${error.message}`);
+  }
 }
 
 /**
@@ -58,12 +73,17 @@ export async function getPaymentRoutes(accessToken: string) {
  * @returns Response indicating submission status
  */
 export async function submitKycInfo(accessToken: string, kycData: any) {
-  return apiRequest<{success: boolean, message: string}>({
-    method: 'POST',
-    url: '/api/kycs/submit',
-    data: kycData,
-    accessToken
-  });
+  try {
+    return await apiRequest<{success: boolean, message: string}>({
+      method: 'POST',
+      url: '/api/kycs/submit',
+      data: kycData,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to submit KYC information:', error);
+    throw new Error(`Failed to submit KYC information: ${error.message}`);
+  }
 }
 
 /**
@@ -72,11 +92,16 @@ export async function submitKycInfo(accessToken: string, kycData: any) {
  * @returns Verification requirements and steps
  */
 export async function getKycRequirements(accessToken: string) {
-  const response = await apiRequest<{ items: KycRequirement[] }>({
-    method: 'GET',
-    url: '/api/kycs/requirements',
-    accessToken
-  });
-  
-  return response.items || [];
+  try {
+    const response = await apiRequest<{ items: KycRequirement[] }>({
+      method: 'GET',
+      url: '/api/kycs/requirements',
+      accessToken
+    });
+    
+    return response.items || [];
+  } catch (error: any) {
+    console.error('Failed to get KYC requirements:', error);
+    throw new Error(`Failed to retrieve KYC requirements: ${error.message}`);
+  }
 }

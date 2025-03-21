@@ -19,12 +19,17 @@ export async function sendFunds(
   accessToken: string, 
   data: SendFundsRequest
 ): Promise<TransferResponse> {
-  return apiRequest<TransferResponse>({
-    method: 'POST',
-    url: '/api/transfers/send',
-    data,
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferResponse>({
+      method: 'POST',
+      url: '/api/transfers/send',
+      data,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to send funds:', error);
+    throw new Error(`Failed to send funds: ${error.message}`);
+  }
 }
 
 /**
@@ -37,12 +42,17 @@ export async function withdrawToWallet(
   accessToken: string,
   data: WalletWithdrawalRequest
 ): Promise<TransferResponse> {
-  return apiRequest<TransferResponse>({
-    method: 'POST',
-    url: '/api/transfers/wallet-withdraw',
-    data,
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferResponse>({
+      method: 'POST',
+      url: '/api/transfers/withdraw',
+      data,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to withdraw to wallet:', error);
+    throw new Error(`Failed to withdraw funds: ${error.message}`);
+  }
 }
 
 /**
@@ -55,12 +65,17 @@ export async function withdrawToBank(
   accessToken: string,
   data: BankWithdrawalRequest
 ): Promise<TransferResponse> {
-  return apiRequest<TransferResponse>({
-    method: 'POST',
-    url: '/api/transfers/offramp',
-    data,
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferResponse>({
+      method: 'POST',
+      url: '/api/transfers/offramp',
+      data,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to withdraw to bank:', error);
+    throw new Error(`Failed to withdraw to bank: ${error.message}`);
+  }
 }
 
 /**
@@ -77,12 +92,17 @@ export async function getTransferHistory(
   limit: number = 10,
   type?: string
 ): Promise<TransferHistoryResponse> {
-  return apiRequest<TransferHistoryResponse>({
-    method: 'GET',
-    url: '/api/transfers',
-    params: { page, limit, type },
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferHistoryResponse>({
+      method: 'GET',
+      url: '/api/transfers',
+      params: { page, limit, type },
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get transfer history:', error);
+    throw new Error(`Failed to retrieve transfer history: ${error.message}`);
+  }
 }
 
 /**
@@ -92,11 +112,16 @@ export async function getTransferHistory(
  * @returns Transfer details
  */
 export async function getTransferDetails(accessToken: string, transferId: string) {
-  return apiRequest<Transfer>({
-    method: 'GET',
-    url: `/api/transfers/${transferId}`,
-    accessToken
-  });
+  try {
+    return await apiRequest<Transfer>({
+      method: 'GET',
+      url: `/api/transfers/${transferId}`,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get transfer details:', error);
+    throw new Error(`Failed to retrieve transfer details: ${error.message}`);
+  }
 }
 
 /**
@@ -113,12 +138,17 @@ export async function getTransferFee(
   network: string,
   type: 'send' | 'withdraw' | 'bridge'
 ): Promise<TransferQuote> {
-  return apiRequest<TransferQuote>({
-    method: 'GET',
-    url: '/api/transfers/quote',
-    params: { amount, network, type },
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferQuote>({
+      method: 'GET',
+      url: '/api/transfers/quote',
+      params: { amount, network, type },
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get transfer fee quote:', error);
+    throw new Error(`Failed to retrieve fee quote: ${error.message}`);
+  }
 }
 
 /**
@@ -135,14 +165,19 @@ export async function bridgeTokens(
   targetNetwork: string,
   amount: string
 ): Promise<TransferResponse> {
-  return apiRequest<TransferResponse>({
-    method: 'POST',
-    url: '/api/transfers/bridge',
-    data: {
-      sourceNetwork,
-      targetNetwork,
-      amount
-    },
-    accessToken
-  });
+  try {
+    return await apiRequest<TransferResponse>({
+      method: 'POST',
+      url: '/api/transfers/bridge',
+      data: {
+        sourceNetwork,
+        targetNetwork,
+        amount
+      },
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to bridge tokens:', error);
+    throw new Error(`Failed to bridge tokens: ${error.message}`);
+  }
 }

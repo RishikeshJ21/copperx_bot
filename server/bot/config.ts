@@ -4,7 +4,7 @@
  */
 export const config = {
   api: {
-    baseURL: 'https://api.copperx.io/v1',
+    baseURL: 'https://income-api.copperx.io',
     timeout: 15000, // 15 seconds timeout for API requests
   },
   bot: {
