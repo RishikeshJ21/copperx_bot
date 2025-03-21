@@ -70,8 +70,20 @@ export function isValidOTP(otp: string): boolean {
 export function isValidBankDetails(bankDetails: string): boolean {
   if (!bankDetails) return false;
   
-  // Minimum length check to ensure enough details are provided
-  return bankDetails.length >= 20;
+  // Check for minimum length
+  if (bankDetails.length < 20) return false;
+  
+  // Check for required fields
+  const requiredFields = [
+    'Bank Name:',
+    'Account Holder:',
+    'Account Number:'
+  ];
+  
+  return requiredFields.every(field => 
+    bankDetails.includes(field) && 
+    bankDetails.indexOf(field) < bankDetails.length - field.length - 2
+  );
 }
 
 /**

@@ -1,6 +1,12 @@
-import { Context } from 'telegraf';
+import { Context, Scenes } from 'telegraf';
 import { Message, Update } from 'telegraf/typings/core/types/typegram';
 import { AuthSessionData, UserData } from './auth';
+
+// Import necessary scene types
+type SceneSessionData = {
+  // Add any scene-specific session data here
+  state?: Record<string, any>;
+};
 
 /**
  * Base session state interface
