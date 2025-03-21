@@ -1,7 +1,7 @@
 import { Markup, Telegraf } from 'telegraf';
 import { LoginStep, isValidEmail, isValidOTP } from '../utils/validation';
 import { createLoginButtons, createBackButton } from '../utils/markup';
-import { requestEmailOTP, verifyEmailOTP } from '../api/auth';
+import { requestEmailOTP, verifyEmailOTP, logout } from '../api/auth';
 import { config } from '../config';
 import { CopperxContext } from '../models';
 
@@ -117,9 +117,42 @@ export function registerLoginCommand(bot: Telegraf) {
     await ctx.answerCbQuery();
     const typedCtx = ctx as CopperxContext;
     
-    // Clear auth data
+    let logoutSuccessful = true;
+    
+    // If there's an active session, call the logout API
+    if (typedCtx.session.auth?.accessToken) {
+      try {
+        // Display loading message
+        await ctx.editMessageText(
+          '🔄 Logging you out...',
+          { reply_markup: { remove_keyboard: true } }
+        );
+        
+        // Call the logout API endpoint
+        const result = await logout(typedCtx.session.auth.accessToken);
+        logoutSuccessful = result;
+        
+        // Log the result for debugging
+        console.log(`Logout API call result: ${result ? 'success' : 'failed'}`);
+        
+      } catch (error) {
+        console.error('Error during logout API call:', error);
+        logoutSuccessful = false;
+      }
+    }
+    
+    // Reset session state
     typedCtx.session.auth = undefined;
     typedCtx.session.login = { step: LoginStep.IDLE, attemptCount: 0 };
+    typedCtx.session.kycStatus = undefined;
+    typedCtx.session.user = undefined;
+    
+    // Reset financial operation states
+    if (typedCtx.session.send) typedCtx.session.send.step = 'idle';
+    if (typedCtx.session.withdraw) typedCtx.session.withdraw.step = 'idle';
+    if (typedCtx.session.deposit) typedCtx.session.deposit = { step: 'idle' };
+    
+    // Save session changes
     await typedCtx.saveSession();
     
     // Disconnect real-time notifications if they're set up
@@ -128,8 +161,13 @@ export function registerLoginCommand(bot: Telegraf) {
       typedCtx.notifications.disconnectUser(chatId);
     }
     
+    // Show success or error message
+    const message = logoutSuccessful
+      ? '✅ You have been logged out successfully.'
+      : '⚠️ Logout completed with warnings. Your local session has been cleared.';
+    
     await ctx.editMessageText(
-      '✅ You have been logged out successfully.',
+      message,
       Markup.inlineKeyboard([
         Markup.button.callback('🔑 Login Again', 'login'),
         Markup.button.callback('🏠 Main Menu', 'main_menu')
@@ -181,7 +219,7 @@ async function handleEmailInput(ctx: CopperxContext, loginState: LoginState) {
   // Validate email format
   if (!email || !isValidEmail(email)) {
     await ctx.reply(
-      `❌ ${config.messages.errors.invalidEmail}\n\nPlease try again with a valid email address.`,
+      `❌ ${config.messages.login.invalidEmail}\n\nPlease try again with a valid email address.`,
       Markup.inlineKeyboard([
         Markup.button.callback('❌ Cancel', 'cancel_login')
       ])
@@ -218,7 +256,7 @@ async function handleEmailInput(ctx: CopperxContext, loginState: LoginState) {
   } catch (error) {
     console.error('Error requesting OTP:', error);
     await ctx.reply(
-      `❌ ${config.messages.errors.login}\n\nThere was a problem sending the OTP. Please try again later.`,
+      `❌ ${config.messages.error.general}\n\nThere was a problem sending the OTP. Please try again later.`,
       Markup.inlineKeyboard([
         Markup.button.callback('🔑 Try Again', 'login'),
         Markup.button.callback('❌ Cancel', 'cancel_login')
@@ -238,7 +276,7 @@ async function handleOTPInput(ctx: CopperxContext, loginState: LoginState) {
   // Validate OTP format
   if (!otp || !isValidOTP(otp)) {
     await ctx.reply(
-      `❌ ${config.messages.errors.invalidOTP}\n\nPlease enter a valid 6-digit OTP code.`,
+      `❌ ${config.messages.login.invalidOTP}\n\nPlease enter a valid 6-digit OTP code.`,
       Markup.inlineKeyboard([
         Markup.button.callback('🔄 Resend OTP', 'resend_otp'),
         Markup.button.callback('❌ Cancel', 'cancel_login')
@@ -323,7 +361,7 @@ async function handleOTPInput(ctx: CopperxContext, loginState: LoginState) {
     
     // Show error and retry options
     await ctx.reply(
-      `❌ ${config.messages.errors.invalidOTP}\n\nThe OTP code is invalid or has expired. Please try again.`,
+      `❌ ${config.messages.login.invalidOTP}\n\nThe OTP code is invalid or has expired. Please try again.`,
       Markup.inlineKeyboard([
         Markup.button.callback('🔄 Resend OTP', 'resend_otp'),
         Markup.button.callback('❌ Cancel', 'cancel_login')
