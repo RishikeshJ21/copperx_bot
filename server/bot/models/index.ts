@@ -19,13 +19,24 @@ export interface BaseSessionState {
   // Current user info
   user?: UserData;
   
+  // KYC status (cached to reduce API calls)
+  kycStatus?: any;
+  
   // Flow-specific states
   login?: any;
   send?: any;
   withdraw?: any;
+  deposit?: any;
   
   // Filters and preferences
   historyFilter?: string;
+  
+  // Last cache time (for refreshing data periodically)
+  lastCacheTime?: {
+    balance?: Date;
+    kyc?: Date;
+    history?: Date;
+  };
 }
 
 /**
