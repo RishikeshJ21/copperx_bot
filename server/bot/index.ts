@@ -1,7 +1,6 @@
 import { Telegraf } from 'telegraf';
-import { setupMiddleware } from './middleware/session';
-import { requireAuth } from './middleware/auth';
 import { registerCommands } from './commands';
+import { setupMiddleware } from './middleware/session';
 import { setupPusherNotifications } from './api/notification';
 import { config } from './config';
 
@@ -10,18 +9,46 @@ import { config } from './config';
  * @returns Configured Telegraf instance
  */
 export function initializeBot(): Telegraf {
-  // Create a new Telegraf instance with the bot token
-  const bot = new Telegraf(config.bot.token);
+  // Get bot token from environment variables
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  
+  if (!botToken) {
+    console.error('No Telegram bot token provided. Please set TELEGRAM_BOT_TOKEN in your environment variables.');
+    process.exit(1);
+  }
+  
+  // Create bot instance
+  const bot = new Telegraf(botToken);
   
   // Set up session middleware
   bot.use(setupMiddleware());
   
-  // Register all command handlers
+  // Register all commands
   registerCommands(bot);
   
+  // Set up webhooks if in production environment, otherwise use long polling
+  if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_DOMAIN) {
+    const webhookDomain = process.env.WEBHOOK_DOMAIN;
+    const webhookPath = process.env.WEBHOOK_PATH || '/webhook';
+    
+    bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
+    console.log(`Webhook set: ${webhookDomain}${webhookPath}`);
+  } else {
+    // Use long polling
+    bot.launch().then(() => {
+      console.log('Bot started in long polling mode');
+    });
+  }
+  
   // Set up Pusher notifications
-  setupPusherNotifications(bot);
-
+  setupPusherNotifications(bot).catch(error => {
+    console.error('Failed to set up Pusher notifications:', error);
+  });
+  
+  // Enable graceful stop
+  process.once('SIGINT', () => bot.stop('SIGINT'));
+  process.once('SIGTERM', () => bot.stop('SIGTERM'));
+  
   return bot;
 }
 
@@ -31,29 +58,10 @@ export function initializeBot(): Telegraf {
 export async function startBot() {
   try {
     const bot = initializeBot();
-    
-    // Launch the bot
-    if (config.bot.webhookDomain) {
-      // Webhook mode for production
-      const webhookUrl = `${config.bot.webhookDomain}${config.bot.webhookPath}`;
-      await bot.telegram.setWebhook(webhookUrl);
-      console.log(`Bot webhook set to ${webhookUrl}`);
-      
-      // Return the bot instance for web server to use
-      return bot;
-    } else {
-      // Long polling mode for development
-      await bot.launch();
-      console.log('Bot started in long polling mode');
-      
-      // Enable graceful stop
-      process.once('SIGINT', () => bot.stop('SIGINT'));
-      process.once('SIGTERM', () => bot.stop('SIGTERM'));
-      
-      return bot;
-    }
+    console.log(`${config.bot.name} is running`);
+    return bot;
   } catch (error) {
-    console.error('Failed to start the bot:', error);
+    console.error('Failed to start bot:', error);
     throw error;
   }
 }

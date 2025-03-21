@@ -1,124 +1,109 @@
-import { Telegraf, Markup } from 'telegraf';
+import { Markup, Telegraf } from 'telegraf';
+import { CopperxContext } from '../models';
+import { requireAuth } from '../middleware/auth';
 import { getUserProfile } from '../api/auth';
+import { getKycStatus } from '../api/kyc';
+import { formatKycStatus } from '../utils/format';
 
+/**
+ * Register profile command handlers
+ * @param bot Telegraf bot instance
+ */
 export function registerProfileCommand(bot: Telegraf) {
-  // Handle /profile command
-  bot.command('profile', async (ctx) => {
-    await handleProfileCommand(ctx);
+  // Profile command
+  bot.command('profile', requireAuth, async (ctx) => {
+    await handleProfileCommand(ctx as any);
   });
   
-  // Also handle keyboard button
-  bot.hears('👤 Profile', async (ctx) => {
-    await handleProfileCommand(ctx);
-  });
-  
-  // Handle refresh profile action
-  bot.action('refresh_profile', async (ctx) => {
-    await ctx.answerCbQuery('Refreshing profile...');
-    await handleProfileCommand(ctx);
-  });
-  
-  // Handle logout action
-  bot.action('logout', async (ctx) => {
+  // Profile action handler
+  bot.action('profile', requireAuth, async (ctx) => {
     await ctx.answerCbQuery();
-    
-    // Confirm logout
-    await ctx.reply(
-      '❓ *Confirm Logout*\n\nAre you sure you want to log out? You will need to authenticate again to use the bot.',
-      {
-        parse_mode: 'Markdown',
-        ...Markup.inlineKeyboard([
-          [Markup.button.callback('Yes, Log Out', 'confirm_logout')],
-          [Markup.button.callback('No, Cancel', 'cancel_logout')]
-        ])
-      }
-    );
+    await handleProfileCommand(ctx as any);
   });
   
-  // Handle logout confirmation
-  bot.action('confirm_logout', async (ctx) => {
+  // Actions for profile management
+  bot.action('update_profile', requireAuth, async (ctx) => {
     await ctx.answerCbQuery();
-    
-    // Clear session
-    delete ctx.session.auth;
-    
     await ctx.reply(
-      '👋 *Logged Out Successfully*\n\nYou have been logged out. Use /login to authenticate again.',
-      {
-        parse_mode: 'Markdown',
-        ...Markup.removeKeyboard()
-      }
+      '🔄 To update your profile information, please visit the Copperx website: https://copperx.io/profile',
+      Markup.inlineKeyboard([
+        [Markup.button.callback('🔙 Back to Profile', 'profile')],
+      ])
     );
-  });
-  
-  // Handle logout cancellation
-  bot.action('cancel_logout', async (ctx) => {
-    await ctx.answerCbQuery('Logout cancelled');
-    await handleProfileCommand(ctx);
   });
 }
 
-async function handleProfileCommand(ctx: any) {
+/**
+ * Handle profile command
+ * @param ctx Telegram context
+ */
+async function handleProfileCommand(ctx: CopperxContext) {
   try {
-    // Show loading message
-    const loadingMsg = await ctx.reply('Loading your profile...');
+    // Use cached user data if available, otherwise fetch from API
+    let userData = ctx.session.auth?.user;
+    let kycStatus = 'Unknown';
     
-    // Get fresh user profile from API
-    const userProfile = await getUserProfile(ctx.session.auth.accessToken);
-    
-    // Delete loading message
-    await ctx.deleteMessage(loadingMsg.message_id);
-    
-    if (!userProfile) {
-      await ctx.reply(
-        '❌ Failed to load your profile. Please try again later.',
-        Markup.inlineKeyboard([
-          Markup.button.callback('Try Again', 'refresh_profile')
-        ])
-      );
-      return;
-    }
-    
-    // Update session with fresh user data
-    ctx.session.auth.user = userProfile;
-    
-    // Create profile message
-    let message = `👤 *User Profile*\n\n`;
-    
-    if (userProfile.firstName || userProfile.lastName) {
-      message += `*Name:* ${userProfile.firstName || ''} ${userProfile.lastName || ''}\n`;
-    }
-    
-    message += `*Email:* ${userProfile.email}\n`;
-    message += `*Account Type:* ${userProfile.type.charAt(0).toUpperCase() + userProfile.type.slice(1)}\n`;
-    message += `*Role:* ${userProfile.role.charAt(0).toUpperCase() + userProfile.role.slice(1)}\n`;
-    
-    if (userProfile.organizationId) {
-      message += `*Organization ID:* \`${userProfile.organizationId}\`\n`;
-    }
-    
-    if (userProfile.walletAddress) {
-      message += `*Wallet Address:* \`${userProfile.walletAddress}\`\n`;
-    }
-    
-    // Send profile with actions
-    await ctx.reply(
-      message,
-      {
-        parse_mode: 'Markdown',
-        ...Markup.inlineKeyboard([
-          [Markup.button.callback('🔄 Refresh Profile', 'refresh_profile')],
-          [Markup.button.callback('🔑 Check KYC Status', 'refresh_kyc')],
-          [Markup.button.callback('📤 Logout', 'logout')]
-        ])
+    if (ctx.session.auth?.accessToken) {
+      try {
+        // Get fresh user data
+        userData = await getUserProfile(ctx.session.auth.accessToken);
+        
+        // Update session with latest user data
+        if (ctx.session.auth) {
+          ctx.session.auth.user = userData;
+          await ctx.saveSession();
+        }
+        
+        // Get KYC status
+        if (userData.email) {
+          const kycData = await getKycStatus(ctx.session.auth.accessToken, userData.email);
+          kycStatus = formatKycStatus(kycData.status);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
       }
-    );
+    }
+    
+    // Prepare profile display message
+    const firstName = userData?.firstName || 'N/A';
+    const lastName = userData?.lastName || '';
+    const email = userData?.email || 'N/A';
+    const accountType = userData?.type || 'Individual';
+    const walletAddress = userData?.walletAddress 
+      ? `${userData.walletAddress.substring(0, 6)}...${userData.walletAddress.substring(userData.walletAddress.length - 4)}`
+      : 'Not set';
+    
+    const message = `👤 *Your Profile*
+
+*Name:* ${firstName} ${lastName}
+*Email:* ${email}
+*Account Type:* ${accountType}
+*KYC Status:* ${kycStatus}
+*Wallet Address:* \`${walletAddress}\`
+`;
+
+    // Get the appropriate response method
+    const respondMethod = 'callback_query' in ctx.update 
+      ? ctx.editMessageText.bind(ctx) 
+      : ctx.reply.bind(ctx);
+    
+    // Send profile information
+    await respondMethod(message, {
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard([
+        [
+          Markup.button.callback('💳 KYC Verification', 'kyc'),
+          Markup.button.callback('✏️ Update Profile', 'update_profile')
+        ],
+        [Markup.button.callback('🏠 Main Menu', 'main_menu')]
+      ])
+    });
   } catch (error) {
-    console.error('Failed to fetch user profile:', error);
+    console.error('Profile command error:', error);
     await ctx.reply(
-      '❌ Failed to load your profile. Please try again later.',
+      '❌ Sorry, there was an error fetching your profile. Please try again later.',
       Markup.inlineKeyboard([
-        Markup.button.callback('Try Again', 'refresh_profile')
+        [Markup.button.callback('🏠 Main Menu', 'main_menu')]
       ])
     );
   }

@@ -16,7 +16,7 @@ import { registerProfileCommand } from './profile';
  * @param bot Telegraf bot instance
  */
 export function registerCommands(bot: Telegraf) {
-  // Register core commands
+  // Register bot commands
   registerStartCommand(bot);
   registerLoginCommand(bot);
   registerHelpCommand(bot);
@@ -29,20 +29,26 @@ export function registerCommands(bot: Telegraf) {
   registerKycCommand(bot);
   registerProfileCommand(bot);
   
-  // Set command list in Telegram
+  // Set up bot command list
   bot.telegram.setMyCommands([
     { command: 'start', description: 'Start the bot' },
     { command: 'login', description: 'Login to your account' },
     { command: 'balance', description: 'Check your balance' },
-    { command: 'wallets', description: 'Manage your wallets' },
     { command: 'send', description: 'Send funds' },
     { command: 'withdraw', description: 'Withdraw funds' },
     { command: 'deposit', description: 'Get deposit address' },
     { command: 'history', description: 'View transaction history' },
+    { command: 'wallets', description: 'Manage your wallets' },
     { command: 'kyc', description: 'Verify your identity' },
     { command: 'profile', description: 'View your profile' },
-    { command: 'help', description: 'Show help' }
-  ]).catch(err => {
-    console.error('Failed to set commands:', err);
+    { command: 'help', description: 'Show help message' }
+  ]);
+  
+  // Add generic error handler
+  bot.catch((err, ctx) => {
+    console.error('Bot error:', err);
+    ctx.reply(
+      '❌ Something went wrong. Please try again or use /start to restart the bot.'
+    );
   });
 }

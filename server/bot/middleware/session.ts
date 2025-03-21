@@ -1,71 +1,115 @@
-import { Context, Middleware } from 'telegraf';
+import { Context, MiddlewareFn } from 'telegraf';
+import { Update } from 'telegraf/typings/core/types/typegram';
+import { BaseSessionState, CopperxContext } from '../models';
 import { storage } from '../../storage';
-import { config } from '../config';
-import { BaseSessionState } from '../models';
+
+const DEFAULT_SESSION_STATE: BaseSessionState = {
+  auth: undefined,
+  user: undefined,
+  login: {
+    step: 'idle',
+    attemptCount: 0
+  },
+  send: {
+    step: 'idle'
+  },
+  withdraw: {
+    step: 'idle'
+  },
+  historyFilter: 'all'
+};
 
 /**
  * Sets up the session middleware to restore and persist session data
  */
-export function setupMiddleware(): Middleware<Context> {
-  return async (ctx, next) => {
-    // Skip processing for non-user messages
-    if (!ctx.from) {
+export function setupMiddleware(): MiddlewareFn<Context> {
+  return async (ctx: Context, next: () => Promise<void>) => {
+    const telegramId = ctx.from?.id.toString();
+    
+    if (!telegramId) {
       return next();
     }
     
-    const telegramId = ctx.from.id.toString();
+    // Type cast to our custom context
+    const typedCtx = ctx as unknown as CopperxContext;
     
+    // Try to load existing session
     try {
-      // Get or create session
-      let session = await storage.getSession(telegramId);
+      const session = await storage.getSession(telegramId);
       
-      if (!session) {
-        // Create new session
-        session = await storage.createSession({
-          telegramId,
-          accessToken: null,
-          expireAt: null,
-          organizationId: null,
-          sid: null,
-          state: {}
-        });
+      // Initialize session if not exists
+      if (session) {
+        typedCtx.session = {
+          ...DEFAULT_SESSION_STATE,
+          ...((session.state as any) || {})
+        };
+      } else {
+        typedCtx.session = { ...DEFAULT_SESSION_STATE };
         
-        // Create user record if it doesn't exist
-        const user = await storage.getUser(telegramId);
-        if (!user) {
+        // Create new user if first interaction
+        const existingUser = await storage.getUser(telegramId);
+        if (!existingUser) {
           await storage.createUser({
             telegramId,
-            firstName: ctx.from.first_name || null,
-            lastName: ctx.from.last_name || null,
-            username: ctx.from.username || null,
+            firstName: ctx.from?.first_name || null,
+            lastName: ctx.from?.last_name || null,
+            username: ctx.from?.username || null,
             email: null
           });
         }
-      }
-      
-      // Add session state to context
-      const sessionState = session.state || {};
-      ctx.session = sessionState as BaseSessionState;
-      
-      // Add session saver function to the context
-      ctx.saveSession = async () => {
-        await storage.updateSession(telegramId, {
-          state: ctx.session
-        });
-      };
-      
-      // Call next middleware
-      await next();
-      
-      // Save session after request
-      if (ctx.session) {
-        await storage.updateSession(telegramId, {
-          state: ctx.session
+        
+        // Create initial session entry
+        await storage.createSession({
+          telegramId,
+          state: typedCtx.session as any,
+          accessToken: null,
+          expireAt: null,
+          sid: null,
+          organizationId: null
         });
       }
     } catch (error) {
-      console.error(`Session middleware error for ${telegramId}:`, error);
-      await next();
+      console.error('Error loading session:', error);
+      typedCtx.session = { ...DEFAULT_SESSION_STATE };
     }
+    
+    // Add session saver method to context
+    typedCtx.saveSession = async () => {
+      try {
+        const existingSession = await storage.getSession(telegramId);
+        
+        if (existingSession) {
+          await storage.updateSession(telegramId, {
+            state: typedCtx.session as any
+          });
+        } else {
+          await storage.createSession({
+            telegramId,
+            state: typedCtx.session as any,
+            accessToken: typedCtx.session.auth?.accessToken || null,
+            expireAt: typedCtx.session.auth?.expireAt ? new Date(typedCtx.session.auth.expireAt) : null,
+            sid: null,
+            organizationId: typedCtx.session.auth?.organizationId || null
+          });
+        }
+      } catch (error) {
+        console.error('Error saving session:', error);
+      }
+    };
+    
+    return next();
   };
+}
+
+/**
+ * Clear all session data for a user
+ * @param telegramId User's Telegram ID
+ */
+export async function clearSession(telegramId: string): Promise<boolean> {
+  try {
+    return await storage.deleteSession(telegramId);
+  } catch (error) {
+    console.error('Error clearing session:', error);
+    return false;
+  }
 }

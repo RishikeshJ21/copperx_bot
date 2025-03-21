@@ -1,26 +1,19 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import { startBot } from './server/bot';
-import { config } from './server/bot/config';
 
-// Load environment variables
-dotenv.config();
-
+/**
+ * Main entry point for running the Telegram bot standalone
+ */
 async function main() {
+  console.log('Starting Copperx Telegram Bot...');
+  
   try {
-    if (!config.bot.token) {
-      console.error("ERROR: No Telegram bot token provided.");
-      console.error("Please provide your bot token by setting TELEGRAM_BOT_TOKEN in your .env file");
-      process.exit(1);
-    }
-    
-    console.log("Starting Copperx Payout Telegram Bot...");
     await startBot();
-    console.log("Bot started successfully in long polling mode!");
-    console.log("Press Ctrl+C to stop the bot");
   } catch (error) {
-    console.error("Failed to start the bot:", error);
+    console.error('Failed to start bot:', error);
     process.exit(1);
   }
 }
 
+// Run the main function
 main();

@@ -4,11 +4,8 @@
  * @returns True if the email is valid
  */
 export function isValidEmail(email: string): boolean {
-  if (!email) {
-    return false;
-  }
-  
-  // Basic regex for email validation
+  if (!email) return false;
+  // Basic email regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
@@ -19,18 +16,20 @@ export function isValidEmail(email: string): boolean {
  * @returns True if the address has a valid format
  */
 export function isValidWalletAddress(address: string): boolean {
-  if (!address) {
-    return false;
-  }
+  if (!address) return false;
   
-  // Basic check for length and valid characters
-  // In a real implementation, network specific address validation would be needed
-  if (address.length < 26 || address.length > 64) {
-    return false;
-  }
+  // Basic checks for common blockchain addresses
+  // Ethereum-like (42 chars, starts with 0x)
+  if (/^0x[a-fA-F0-9]{40}$/.test(address)) return true;
   
-  // Check for basic alphanumeric characters
-  return /^[a-zA-Z0-9]+$/.test(address);
+  // Solana (32-44 chars base58)
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)) return true;
+  
+  // Tron (34 chars, starts with T)
+  if (/^T[A-Za-z1-9]{33}$/.test(address)) return true;
+  
+  // General check for reasonable length
+  return address.length >= 24 && address.length <= 64;
 }
 
 /**
@@ -39,20 +38,15 @@ export function isValidWalletAddress(address: string): boolean {
  * @returns True if the amount is a valid number
  */
 export function isValidAmount(amount: string): boolean {
-  if (!amount) {
-    return false;
-  }
+  if (!amount) return false;
   
-  // Check if it's a valid positive number with up to 8 decimal places
-  const amountRegex = /^(?!0\d)(\d+)?(?:\.\d{1,8})?$/;
+  // Checks for valid number format with up to 6 decimal places
+  const amountRegex = /^[0-9]+(\.[0-9]{1,6})?$/;
+  if (!amountRegex.test(amount)) return false;
   
-  if (!amountRegex.test(amount)) {
-    return false;
-  }
-  
-  // Ensure the value is greater than zero
-  const numberAmount = parseFloat(amount);
-  return !isNaN(numberAmount) && numberAmount > 0;
+  // Convert to number and check if it's positive
+  const numAmount = parseFloat(amount);
+  return !isNaN(numAmount) && numAmount > 0;
 }
 
 /**
@@ -61,12 +55,11 @@ export function isValidAmount(amount: string): boolean {
  * @returns True if the OTP has a valid format
  */
 export function isValidOTP(otp: string): boolean {
-  if (!otp) {
-    return false;
-  }
+  if (!otp) return false;
   
-  // Check if OTP is 6 digits
-  return /^\d{6}$/.test(otp);
+  // Typically 6 digits, but allow 4-8 digits for flexibility
+  const otpRegex = /^[0-9]{4,8}$/;
+  return otpRegex.test(otp);
 }
 
 /**
@@ -75,23 +68,10 @@ export function isValidOTP(otp: string): boolean {
  * @returns True if the bank details have enough information
  */
 export function isValidBankDetails(bankDetails: string): boolean {
-  if (!bankDetails) {
-    return false;
-  }
+  if (!bankDetails) return false;
   
-  // Check if it contains minimum required fields
-  // This is a simple check; in real scenario would need proper parsing and validation
-  const requiredTerms = ['account', 'bank', 'name'];
-  const lowerCaseDetails = bankDetails.toLowerCase();
-  
-  let foundCount = 0;
-  for (const term of requiredTerms) {
-    if (lowerCaseDetails.includes(term)) {
-      foundCount++;
-    }
-  }
-  
-  return foundCount >= 2;
+  // Minimum length check to ensure enough details are provided
+  return bankDetails.length >= 20;
 }
 
 /**
@@ -100,13 +80,18 @@ export function isValidBankDetails(bankDetails: string): boolean {
  * @returns True if the transaction ID has a valid format
  */
 export function isValidTransactionId(transactionId: string): boolean {
-  if (!transactionId) {
-    return false;
-  }
+  if (!transactionId) return false;
   
-  // Check if it's a valid alphanumeric with hyphens
-  // UUID format or similar transaction ID format
-  return /^[a-zA-Z0-9\-]{8,36}$/.test(transactionId);
+  // Uuid v4 format
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  
+  // Hex format (common for blockchain txids)
+  const hexRegex = /^0x[a-f0-9]{64}$/i;
+  
+  // General alphanumeric format with reasonable length
+  const generalRegex = /^[a-z0-9]{8,64}$/i;
+  
+  return uuidRegex.test(transactionId) || hexRegex.test(transactionId) || generalRegex.test(transactionId);
 }
 
 /**
@@ -117,7 +102,7 @@ export function isValidTransactionId(transactionId: string): boolean {
  * @returns True if the value is within range
  */
 export function isInRange(value: number, min: number, max: number): boolean {
-  return !isNaN(value) && value >= min && value <= max;
+  return value >= min && value <= max;
 }
 
 /**
@@ -127,17 +112,16 @@ export function isInRange(value: number, min: number, max: number): boolean {
  * @returns True if the network is valid
  */
 export function isValidNetwork(network: string, validNetworks?: string[]): boolean {
-  if (!network) {
-    return false;
-  }
+  if (!network) return false;
   
+  // If list of valid networks provided, check against it
   if (validNetworks && validNetworks.length > 0) {
     return validNetworks.includes(network.toLowerCase());
   }
   
-  // Basic check for common networks
-  const commonNetworks = ['ethereum', 'solana', 'polygon', 'bsc', 'avalanche', 'bitcoin'];
-  return commonNetworks.includes(network.toLowerCase());
+  // Default basic check for common networks
+  const commonNetworks = ['ethereum', 'solana', 'bitcoin', 'polygon', 'bnb', 'avalanche', 'arbitrum'];
+  return commonNetworks.includes(network.toLowerCase()) || network.length >= 3;
 }
 
 /**
@@ -146,14 +130,12 @@ export function isValidNetwork(network: string, validNetworks?: string[]): boole
  * @returns True if the phone number has a valid format
  */
 export function isValidPhoneNumber(phone: string): boolean {
-  if (!phone) {
-    return false;
-  }
+  if (!phone) return false;
   
-  // International phone number regex
-  // Allows +, spaces, dashes, parentheses
-  // Between 8-15 digits
-  return /^[\+]?[(]?[0-9]{1,3}[)]?[-\s\.]?[0-9]{3,4}[-\s\.]?[0-9]{3,8}$/.test(phone);
+  // Allow digits, plus, dash, parentheses, and spaces
+  // Minimum 10 characters
+  const phoneRegex = /^[0-9\+\-\(\)\s]{10,20}$/;
+  return phoneRegex.test(phone);
 }
 
 /**
@@ -162,9 +144,43 @@ export function isValidPhoneNumber(phone: string): boolean {
  * @returns True if the string is alphanumeric
  */
 export function isAlphanumeric(str: string): boolean {
-  if (!str) {
-    return false;
-  }
+  if (!str) return false;
   
-  return /^[a-zA-Z0-9]+$/.test(str);
+  const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+  return alphanumericRegex.test(str);
+}
+
+/**
+ * Login state for the login flow
+ */
+export enum LoginStep {
+  IDLE = 'idle',
+  WAITING_FOR_EMAIL = 'waiting_for_email',
+  WAITING_FOR_OTP = 'waiting_for_otp',
+}
+
+/**
+ * Withdraw step enum
+ * Steps in the withdrawal flow
+ */
+export enum WithdrawStep {
+  IDLE = 'idle',
+  SELECT_METHOD = 'select_method',
+  ENTER_RECIPIENT = 'enter_recipient',
+  ENTER_AMOUNT = 'enter_amount',
+  ENTER_BANK_DETAILS = 'enter_bank_details',
+  SELECT_NETWORK = 'select_network',
+  CONFIRM_TRANSACTION = 'confirm_transaction',
+}
+
+/**
+ * Send step enum
+ * Steps in the send flow
+ */
+export enum SendStep {
+  IDLE = 'idle',
+  SELECT_METHOD = 'select_method',
+  ENTER_RECIPIENT = 'enter_recipient',
+  ENTER_AMOUNT = 'enter_amount',
+  CONFIRM_TRANSACTION = 'confirm_transaction',
 }

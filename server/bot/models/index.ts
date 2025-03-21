@@ -1,4 +1,5 @@
 import { Context } from 'telegraf';
+import { Message, Update } from 'telegraf/typings/core/types/typegram';
 import { AuthSessionData, UserData } from './auth';
 
 /**

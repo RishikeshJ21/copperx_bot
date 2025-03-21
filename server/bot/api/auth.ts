@@ -7,11 +7,16 @@ import { EmailOtpRequestResponse, EmailOtpVerifyResponse, UserData } from '../mo
  * @returns Response containing email and session ID
  */
 export async function requestEmailOTP(email: string): Promise<EmailOtpRequestResponse> {
-  return apiRequest<EmailOtpRequestResponse>({
-    method: 'POST',
-    url: '/api/auth/email/request-otp',
-    data: { email }
-  });
+  try {
+    return await apiRequest<EmailOtpRequestResponse>({
+      method: 'POST',
+      url: '/auth/email/request',
+      data: { email },
+    });
+  } catch (error) {
+    console.error('Failed to request email OTP:', error);
+    throw new Error(`Failed to send verification code: ${error.message}`);
+  }
 }
 
 /**
@@ -26,11 +31,16 @@ export async function verifyEmailOTP(
   otp: string,
   sid: string
 ): Promise<EmailOtpVerifyResponse> {
-  return apiRequest<EmailOtpVerifyResponse>({
-    method: 'POST',
-    url: '/api/auth/email/verify-otp',
-    data: { email, otp, sid }
-  });
+  try {
+    return await apiRequest<EmailOtpVerifyResponse>({
+      method: 'POST',
+      url: '/auth/email/verify',
+      data: { email, otp, sid },
+    });
+  } catch (error) {
+    console.error('Failed to verify email OTP:', error);
+    throw new Error(`Failed to verify code: ${error.message}`);
+  }
 }
 
 /**
@@ -39,11 +49,16 @@ export async function verifyEmailOTP(
  * @returns User profile data
  */
 export async function getUserProfile(accessToken: string): Promise<UserData> {
-  return apiRequest<UserData>({
-    method: 'GET',
-    url: '/api/users/me',
-    accessToken
-  });
+  try {
+    return await apiRequest<UserData>({
+      method: 'GET',
+      url: '/user/profile',
+      accessToken,
+    });
+  } catch (error) {
+    console.error('Failed to get user profile:', error);
+    throw new Error(`Failed to retrieve profile: ${error.message}`);
+  }
 }
 
 /**
@@ -52,11 +67,17 @@ export async function getUserProfile(accessToken: string): Promise<UserData> {
  * @returns Success status
  */
 export async function logout(accessToken: string): Promise<boolean> {
-  return apiRequest<boolean>({
-    method: 'POST',
-    url: '/api/auth/logout',
-    accessToken
-  });
+  try {
+    await apiRequest<{ success: boolean }>({
+      method: 'POST',
+      url: '/auth/logout',
+      accessToken,
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to logout:', error);
+    return false;
+  }
 }
 
 /**
@@ -66,10 +87,15 @@ export async function logout(accessToken: string): Promise<boolean> {
  * @returns Updated user data
  */
 export async function updateUserFlag(accessToken: string, flag: string): Promise<UserData> {
-  return apiRequest<UserData>({
-    method: 'PATCH',
-    url: '/api/users/me/flags',
-    data: { flag },
-    accessToken
-  });
+  try {
+    return await apiRequest<UserData>({
+      method: 'PATCH',
+      url: '/user/flags',
+      data: { flag, value: true },
+      accessToken,
+    });
+  } catch (error) {
+    console.error('Failed to update user flag:', error);
+    throw new Error(`Failed to update preferences: ${error.message}`);
+  }
 }

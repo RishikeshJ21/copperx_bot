@@ -1,3 +1,5 @@
+import { format, formatDistance } from 'date-fns';
+
 /**
  * Formats a currency value with 2 decimal places
  * @param value Number to format
@@ -5,11 +7,7 @@
  * @returns Formatted string
  */
 export function formatCurrency(value: number, decimals: number = 2): string {
-  if (isNaN(value)) {
-    return '0.00';
-  }
-  
-  return value.toFixed(decimals);
+  return Number(value).toFixed(decimals);
 }
 
 /**
@@ -19,43 +17,27 @@ export function formatCurrency(value: number, decimals: number = 2): string {
  * @returns Formatted date string
  */
 export function formatDate(dateString: string | Date, format: 'short' | 'long' | 'relative' = 'short'): string {
-  if (!dateString) {
-    return 'N/A';
-  }
-  
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-  
-  if (isNaN(date.getTime())) {
-    return 'Invalid date';
-  }
-  
-  switch (format) {
-    case 'short':
-      return date.toLocaleDateString();
+  try {
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     
-    case 'long':
-      return date.toLocaleString();
-    
-    case 'relative': {
-      const now = new Date();
-      const diffMs = now.getTime() - date.getTime();
-      const diffSeconds = Math.floor(diffMs / 1000);
-      const diffMinutes = Math.floor(diffSeconds / 60);
-      const diffHours = Math.floor(diffMinutes / 60);
-      const diffDays = Math.floor(diffHours / 24);
-      
-      if (diffDays > 30) {
-        return date.toLocaleDateString();
-      } else if (diffDays > 0) {
-        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-      } else if (diffHours > 0) {
-        return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-      } else if (diffMinutes > 0) {
-        return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
-      } else {
-        return 'Just now';
-      }
+    switch (format) {
+      case 'short':
+        return date.toISOString().split('T')[0];
+      case 'long':
+        return date.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      case 'relative':
+        return formatDistance(date, new Date(), { addSuffix: true });
+      default:
+        return date.toISOString().split('T')[0];
     }
+  } catch (error) {
+    return 'Invalid date';
   }
 }
 
@@ -67,15 +49,10 @@ export function formatDate(dateString: string | Date, format: 'short' | 'long' |
  * @returns Truncated string
  */
 export function truncateWithEllipsis(str: string, startChars: number = 6, endChars: number = 4): string {
-  if (!str) {
-    return '';
-  }
+  if (!str) return '';
+  if (str.length <= startChars + endChars) return str;
   
-  if (str.length <= startChars + endChars) {
-    return str;
-  }
-  
-  return `${str.slice(0, startChars)}...${str.slice(-endChars)}`;
+  return `${str.substring(0, startChars)}...${str.substring(str.length - endChars)}`;
 }
 
 /**
@@ -84,11 +61,8 @@ export function truncateWithEllipsis(str: string, startChars: number = 6, endCha
  * @returns Formatted address
  */
 export function formatWalletAddress(address: string): string {
-  if (!address) {
-    return 'N/A';
-  }
-  
-  return truncateWithEllipsis(address, 8, 6);
+  if (!address) return 'N/A';
+  return truncateWithEllipsis(address, 6, 4);
 }
 
 /**
@@ -97,10 +71,7 @@ export function formatWalletAddress(address: string): string {
  * @returns Formatted network name
  */
 export function formatNetworkName(network: string): string {
-  if (!network) {
-    return 'N/A';
-  }
-  
+  if (!network) return 'N/A';
   return network.charAt(0).toUpperCase() + network.slice(1).toLowerCase();
 }
 
@@ -110,25 +81,19 @@ export function formatNetworkName(network: string): string {
  * @returns Formatted status with emoji
  */
 export function formatTransactionStatus(status: string): string {
-  if (!status) {
-    return '❓ Unknown';
-  }
-  
-  const statusLower = status.toLowerCase();
-  
-  switch (statusLower) {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+      return '✅ Completed';
     case 'pending':
       return '⏳ Pending';
     case 'processing':
       return '🔄 Processing';
-    case 'completed':
-      return '✅ Completed';
     case 'failed':
       return '❌ Failed';
     case 'cancelled':
       return '🚫 Cancelled';
     default:
-      return `❓ ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+      return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
   }
 }
 
@@ -138,25 +103,18 @@ export function formatTransactionStatus(status: string): string {
  * @returns Formatted status with emoji
  */
 export function formatKycStatus(status: string): string {
-  if (!status) {
-    return '❓ Unknown';
-  }
-  
-  const statusLower = status.toLowerCase();
-  
-  switch (statusLower) {
-    case 'not_started':
-    case 'notstarted':
-      return '🆕 Not Started';
-    case 'pending':
-      return '⏳ Pending';
+  switch (status?.toLowerCase()) {
     case 'verified':
       return '✅ Verified';
+    case 'pending':
+      return '⏳ Pending Review';
+    case 'not_started':
+      return '🔔 Not Started';
     case 'rejected':
       return '❌ Rejected';
     case 'expired':
       return '⚠️ Expired';
     default:
-      return `❓ ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+      return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
   }
 }

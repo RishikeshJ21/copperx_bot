@@ -1,57 +1,64 @@
-import { Telegraf } from 'telegraf';
-import { createLoginButtons } from '../utils/markup';
+import { Markup, Telegraf } from 'telegraf';
 import { config } from '../config';
-import { storage } from '../../storage';
+import { createLoginButtons, createMainMenuButtons } from '../utils/markup';
 import { CopperxContext } from '../models';
 
+/**
+ * Register the start command handler
+ * @param bot Telegraf bot instance
+ */
 export function registerStartCommand(bot: Telegraf) {
-  // Handle /start command
-  bot.command('start', async (ctx) => {
-    try {
-      const telegramId = ctx.from?.id.toString();
+  // Handler for /start command
+  bot.start(async (ctx) => {
+    const typedCtx = ctx as any as CopperxContext;
+    
+    // User already logged in
+    if (typedCtx.session?.auth?.accessToken) {
+      const firstName = typedCtx.session.auth.user?.firstName || 'there';
       
-      if (!telegramId) {
-        return;
-      }
-      
-      // Get user from storage
-      let user = await storage.getUser(telegramId);
-      
-      // Create new user if not exists
-      if (!user) {
-        user = await storage.createUser({
-          telegramId,
-          firstName: ctx.from?.first_name || null,
-          lastName: ctx.from?.last_name || null,
-          username: ctx.from?.username || null,
-          email: null
-        });
-      }
-      
-      // Send welcome message
-      await ctx.replyWithMarkdown(
-        config.messages.welcome,
-        createLoginButtons()
+      await ctx.reply(
+        `👋 Welcome back, *${firstName}*!\n\nYou can use the menu below to access Copperx Payout features.`,
+        {
+          parse_mode: 'Markdown',
+          ...createMainMenuButtons()
+        }
       );
-      
-      // Reset any ongoing flow states
-      if ((ctx as CopperxContext).session) {
-        if ((ctx as CopperxContext).session.login) {
-          (ctx as CopperxContext).session.login = undefined;
-        }
-        if ((ctx as CopperxContext).session.send) {
-          (ctx as CopperxContext).session.send = undefined;
-        }
-        if ((ctx as CopperxContext).session.withdraw) {
-          (ctx as CopperxContext).session.withdraw = undefined;
-        }
-        
-        // Save the session
-        await (ctx as CopperxContext).saveSession();
+      return;
+    }
+    
+    // New user, show welcome message
+    await ctx.reply(
+      config.messages.welcome,
+      {
+        parse_mode: 'Markdown',
+        ...createLoginButtons()
       }
-    } catch (error) {
-      console.error('Error in start command:', error);
-      await ctx.reply('Sorry, there was an error starting the bot. Please try again.');
+    );
+  });
+  
+  // Handler for main menu action
+  bot.action('main_menu', async (ctx) => {
+    await ctx.answerCbQuery();
+    const typedCtx = ctx as any as CopperxContext;
+    
+    if (typedCtx.session?.auth?.accessToken) {
+      const firstName = typedCtx.session.auth.user?.firstName || 'there';
+      
+      await ctx.editMessageText(
+        `👋 Hello, *${firstName}*!\n\nYou can use the menu below to access Copperx Payout features.`,
+        {
+          parse_mode: 'Markdown',
+          ...createMainMenuButtons()
+        }
+      );
+    } else {
+      await ctx.editMessageText(
+        config.messages.welcome,
+        {
+          parse_mode: 'Markdown',
+          ...createLoginButtons()
+        }
+      );
     }
   });
 }

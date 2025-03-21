@@ -1,5 +1,4 @@
 import { Markup } from 'telegraf';
-import { formatWalletAddress, formatNetworkName } from './format';
 
 /**
  * Creates a main menu keyboard
@@ -9,20 +8,19 @@ export function createMainMenuButtons() {
   return Markup.inlineKeyboard([
     [
       Markup.button.callback('💰 Balance', 'balance'),
-      Markup.button.callback('🏦 Wallets', 'wallets')
+      Markup.button.callback('💸 Send', 'send')
     ],
     [
-      Markup.button.callback('📤 Send', 'send'),
-      Markup.button.callback('💸 Withdraw', 'withdraw'),
-      Markup.button.callback('📥 Deposit', 'deposit')
+      Markup.button.callback('⬆️ Deposit', 'deposit'),
+      Markup.button.callback('⬇️ Withdraw', 'withdraw')
     ],
     [
-      Markup.button.callback('📋 History', 'history'),
+      Markup.button.callback('🔄 History', 'history'),
+      Markup.button.callback('💼 Wallets', 'wallets')
+    ],
+    [
       Markup.button.callback('👤 Profile', 'profile'),
-      Markup.button.callback('🔐 KYC', 'kyc')
-    ],
-    [
-      Markup.button.callback('ℹ️ Help', 'help')
+      Markup.button.callback('📚 Help', 'help')
     ]
   ]);
 }
@@ -33,8 +31,9 @@ export function createMainMenuButtons() {
  */
 export function createLoginButtons() {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('🔑 Login with Email', 'login_email')],
-    [Markup.button.callback('ℹ️ Help', 'help')]
+    [Markup.button.callback('🔑 Login to Copperx', 'login')],
+    [Markup.button.url('📝 Sign Up', 'https://copperx.io/signup')],
+    [Markup.button.callback('❓ Help', 'help')]
   ]);
 }
 
@@ -45,7 +44,7 @@ export function createLoginButtons() {
  */
 export function createBackButton(action: string = 'main_menu') {
   return Markup.inlineKeyboard([
-    [Markup.button.callback('⬅️ Back', action)]
+    [Markup.button.callback('🔙 Back', action)]
   ]);
 }
 
@@ -82,20 +81,22 @@ export function createConfirmButtons(confirmAction: string, cancelAction: string
  * @returns Inline keyboard with wallet selection buttons
  */
 export function createWalletNetworkButtons(wallets: any[], actionPrefix: string) {
-  const buttons = wallets.map(wallet => {
-    // Format button text based on wallet properties
-    const networkName = formatNetworkName(wallet.network);
-    const balanceText = wallet.balance ? wallet.balance : '0.00';
-    const buttonText = `${networkName} (${balanceText} USDC)`;
-    
-    // Create callback data with wallet ID
-    return [Markup.button.callback(buttonText, `${actionPrefix}_${wallet.walletId}`)];
-  });
+  // Group buttons in pairs (2 columns)
+  const rows = [];
+  const chunkedWallets = chunkArray(wallets, 2);
   
-  // Add back button
-  buttons.push([Markup.button.callback('⬅️ Back', 'main_menu')]);
+  for (const chunk of chunkedWallets) {
+    const row = chunk.map(wallet => {
+      const network = wallet.network || 'unknown';
+      const balance = wallet.balance || '0.00';
+      const label = `${network.charAt(0).toUpperCase() + network.slice(1)} (${balance})`;
+      return Markup.button.callback(label, `${actionPrefix}_${wallet.walletId || wallet.network}`);
+    });
+    rows.push(row);
+  }
   
-  return Markup.inlineKeyboard(buttons);
+  rows.push([Markup.button.callback('🔙 Back', 'main_menu')]);
+  return Markup.inlineKeyboard(rows);
 }
 
 /**
@@ -107,27 +108,21 @@ export function createWalletNetworkButtons(wallets: any[], actionPrefix: string)
  */
 export function createPaginationButtons(currentPage: number, totalPages: number, actionPrefix: string) {
   const buttons = [];
-  const navRow = [];
   
-  // Add previous page button if not on first page
   if (currentPage > 1) {
-    navRow.push(Markup.button.callback('⬅️ Prev', `${actionPrefix}_page_${currentPage - 1}`));
+    buttons.push(Markup.button.callback('⬅️ Previous', `${actionPrefix}_${currentPage - 1}`));
   }
   
-  // Add current page indicator
-  navRow.push(Markup.button.callback(`${currentPage}/${totalPages}`, 'noop'));
+  buttons.push(Markup.button.callback(`${currentPage}/${totalPages}`, 'noop'));
   
-  // Add next page button if not on last page
   if (currentPage < totalPages) {
-    navRow.push(Markup.button.callback('Next ➡️', `${actionPrefix}_page_${currentPage + 1}`));
+    buttons.push(Markup.button.callback('Next ➡️', `${actionPrefix}_${currentPage + 1}`));
   }
   
-  buttons.push(navRow);
-  
-  // Add back button
-  buttons.push([Markup.button.callback('⬅️ Back', 'main_menu')]);
-  
-  return Markup.inlineKeyboard(buttons);
+  return Markup.inlineKeyboard([
+    buttons,
+    [Markup.button.callback('🔙 Back', 'main_menu')]
+  ]);
 }
 
 /**
@@ -138,26 +133,15 @@ export function createPaginationButtons(currentPage: number, totalPages: number,
 export function createHistoryFilterButtons(currentFilter?: string) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback(
-        `${currentFilter === 'all' ? '✓ ' : ''}All`, 
-        'history_filter_all'
-      ),
-      Markup.button.callback(
-        `${currentFilter === 'deposit' ? '✓ ' : ''}Deposits`, 
-        'history_filter_deposit'
-      )
+      Markup.button.callback(currentFilter === 'all' ? '✅ All' : 'All', 'history_filter_all'),
+      Markup.button.callback(currentFilter === 'deposit' ? '✅ Deposits' : 'Deposits', 'history_filter_deposit')
     ],
     [
-      Markup.button.callback(
-        `${currentFilter === 'withdraw' ? '✓ ' : ''}Withdrawals`, 
-        'history_filter_withdraw'
-      ),
-      Markup.button.callback(
-        `${currentFilter === 'send' ? '✓ ' : ''}Transfers`, 
-        'history_filter_send'
-      )
+      Markup.button.callback(currentFilter === 'send' ? '✅ Sent' : 'Sent', 'history_filter_send'),
+      Markup.button.callback(currentFilter === 'withdraw' ? '✅ Withdrawals' : 'Withdrawals', 'history_filter_withdraw')
     ],
-    [Markup.button.callback('⬅️ Back', 'main_menu')]
+    [Markup.button.callback('🔄 Refresh', 'history_refresh')],
+    [Markup.button.callback('🔙 Back', 'main_menu')]
   ]);
 }
 
@@ -169,36 +153,17 @@ export function createHistoryFilterButtons(currentFilter?: string) {
 export function createKycActionButtons(status: string) {
   const buttons = [];
   
-  switch (status.toLowerCase()) {
-    case 'not_started':
-    case 'notstarted':
-      buttons.push([Markup.button.callback('🚀 Start KYC Verification', 'kyc_start')]);
-      break;
-      
-    case 'pending':
-      buttons.push([Markup.button.callback('🔄 Check Status', 'kyc_check')]);
-      break;
-      
-    case 'rejected':
-      buttons.push([Markup.button.callback('🔄 Re-submit KYC', 'kyc_start')]);
-      buttons.push([Markup.button.callback('❓ Why Rejected', 'kyc_why_rejected')]);
-      break;
-      
-    case 'expired':
-      buttons.push([Markup.button.callback('🔄 Renew KYC', 'kyc_start')]);
-      break;
-      
-    case 'verified':
-      buttons.push([Markup.button.callback('📋 View KYC Details', 'kyc_details')]);
-      break;
-      
-    default:
-      buttons.push([Markup.button.callback('❓ Check Status', 'kyc_check')]);
+  if (status === 'not_started' || status === 'rejected') {
+    buttons.push([Markup.button.url('🔍 Start Verification', 'https://copperx.io/kyc')]);
+  } else if (status === 'pending') {
+    buttons.push([Markup.button.callback('🔄 Check Status', 'kyc_check')]);
+  } else if (status === 'verified') {
+    buttons.push([Markup.button.callback('🏆 View Limits', 'kyc_limits')]);
+  } else if (status === 'expired') {
+    buttons.push([Markup.button.url('🔄 Renew Verification', 'https://copperx.io/kyc')]);
   }
   
-  // Add back button
-  buttons.push([Markup.button.callback('⬅️ Back', 'main_menu')]);
-  
+  buttons.push([Markup.button.callback('🔙 Back', 'main_menu')]);
   return Markup.inlineKeyboard(buttons);
 }
 
@@ -211,10 +176,10 @@ export function createKycActionButtons(status: string) {
 export function createDepositAddressButtons(network: string, address: string) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback('📋 Copy Address', `copy_address_${network}`),
-      Markup.button.callback('🔄 Refresh', `deposit_refresh_${network}`)
+      Markup.button.callback('📋 Copy Address', `copy_${address}`),
+      Markup.button.callback('🔄 Refresh', `deposit_${network}`)
     ],
-    [Markup.button.callback('⬅️ Back', 'main_menu')]
+    [Markup.button.callback('🔙 Back', 'deposit')]
   ]);
 }
 
@@ -226,16 +191,25 @@ export function createDepositAddressButtons(network: string, address: string) {
 export function createWalletActionButtons(wallet: any) {
   return Markup.inlineKeyboard([
     [
-      Markup.button.callback('📥 Deposit', `deposit_${wallet.network}`),
-      Markup.button.callback('📤 Send', `send_${wallet.network}`),
-      Markup.button.callback('💸 Withdraw', `withdraw_${wallet.network}`)
+      Markup.button.callback('⬆️ Deposit', `deposit_${wallet.network}`),
+      Markup.button.callback('⬇️ Withdraw', `withdraw_from_${wallet.walletId || wallet.network}`)
     ],
     [
-      Markup.button.callback(
-        wallet.isDefault ? '✓ Default Wallet' : '📌 Set as Default',
-        `set_default_wallet_${wallet.walletId}`
-      )
+      Markup.button.callback('💸 Send', `send_from_${wallet.walletId || wallet.network}`),
+      Markup.button.callback('📊 Transactions', `history_${wallet.network}`)
     ],
-    [Markup.button.callback('⬅️ Back', 'wallets')]
+    [
+      Markup.button.callback('⭐ Set as Default', `set_default_${wallet.walletId || wallet.network}`),
+      Markup.button.callback('🔙 Back', 'wallets')
+    ]
   ]);
+}
+
+// Helper function to chunk array into smaller arrays
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const results: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    results.push(array.slice(i, i + chunkSize));
+  }
+  return results;
 }

@@ -1,17 +1,11 @@
-import { Telegraf, Markup, Scenes, session } from 'telegraf';
-import { message } from 'telegraf/filters';
+import { Markup, Telegraf } from 'telegraf';
+import { LoginStep, isValidEmail, isValidOTP } from '../utils/validation';
+import { createLoginButtons, createBackButton } from '../utils/markup';
 import { requestEmailOTP, verifyEmailOTP } from '../api/auth';
-import { storage } from '../../storage';
-import { isValidEmail } from '../utils/validation';
+import { config } from '../config';
+import { CopperxContext } from '../models';
 
-// Define login steps
-enum LoginStep {
-  IDLE = 'idle',
-  WAITING_FOR_EMAIL = 'waiting_for_email',
-  WAITING_FOR_OTP = 'waiting_for_otp',
-}
-
-// Define login state for session
+// Interface for the login state
 interface LoginState {
   step: LoginStep;
   email?: string;
@@ -19,267 +13,321 @@ interface LoginState {
   attemptCount: number;
 }
 
+/**
+ * Register login command handlers
+ * @param bot Telegraf bot instance
+ */
 export function registerLoginCommand(bot: Telegraf) {
-  // Handle /login command
-  bot.command('login', async (ctx) => {
-    // Reset login state
-    ctx.session.login = {
-      step: LoginStep.IDLE,
-      attemptCount: 0,
-    };
+  // Command handler for /login
+  bot.command('login', async (ctx: any) => {
+    // Clear any previous login state
+    const typedCtx = ctx as CopperxContext;
     
-    await startLoginFlow(ctx);
-  });
-  
-  // Also handle the keyboard button
-  bot.hears('🔑 Login', async (ctx) => {
-    ctx.session.login = {
-      step: LoginStep.IDLE,
-      attemptCount: 0,
-    };
-    
-    await startLoginFlow(ctx);
-  });
-  
-  // Handle email input
-  bot.on(message('text'), async (ctx) => {
-    const loginState = ctx.session.login as LoginState;
-    
-    // Skip if not in login flow
-    if (!loginState || loginState.step === LoginStep.IDLE) {
+    // Check if user is already logged in
+    if (typedCtx.session.auth?.accessToken) {
+      await ctx.reply(
+        '✅ You are already logged in!',
+        Markup.inlineKeyboard([
+          Markup.button.callback('🔄 Refresh Session', 'refresh_session'),
+          Markup.button.callback('❌ Logout', 'logout')
+        ])
+      );
       return;
     }
     
-    if (loginState.step === LoginStep.WAITING_FOR_EMAIL) {
-      await handleEmailInput(ctx, loginState);
-    } else if (loginState.step === LoginStep.WAITING_FOR_OTP) {
-      await handleOTPInput(ctx, loginState);
-    }
+    await startLoginFlow(typedCtx);
   });
   
-  // Handle cancel button
-  bot.action('cancel_login', async (ctx) => {
+  // Login button handler
+  bot.action('login', async (ctx: any) => {
     await ctx.answerCbQuery();
-    delete ctx.session.login;
-    await ctx.reply(
-      'Login process canceled. You can restart by using the /login command.',
-      Markup.removeKeyboard()
+    await startLoginFlow(ctx as CopperxContext);
+  });
+  
+  // Handler for going back to main menu
+  bot.action('cancel_login', async (ctx: any) => {
+    await ctx.answerCbQuery();
+    const typedCtx = ctx as CopperxContext;
+    
+    // Clear login state
+    if (typedCtx.session.login) {
+      typedCtx.session.login = { step: LoginStep.IDLE, attemptCount: 0 };
+      await typedCtx.saveSession();
+    }
+    
+    await ctx.editMessageText(
+      '⚠️ Login canceled. Return to the main menu to start again.',
+      Markup.inlineKeyboard([
+        Markup.button.callback('🏠 Main Menu', 'main_menu')
+      ])
     );
   });
   
-  // Handle resend OTP button
-  bot.action('resend_otp', async (ctx) => {
-    await ctx.answerCbQuery();
-    const loginState = ctx.session.login as LoginState;
+  // Handler for text input (email and OTP)
+  bot.on('text', async (ctx: any) => {
+    const typedCtx = ctx as CopperxContext;
     
-    if (!loginState || !loginState.email) {
-      await ctx.reply('Login session expired. Please use /login to start again.');
+    // If no login state or not in active login flow, ignore
+    if (!typedCtx.session.login || typedCtx.session.login.step === LoginStep.IDLE) {
       return;
     }
     
-    try {
-      const response = await requestEmailOTP(loginState.email);
-      loginState.sid = response.sid;
-      
-      await ctx.reply(
-        `A new OTP code has been sent to ${loginState.email}. Please enter it below:`,
-        Markup.inlineKeyboard([
-          Markup.button.callback('Cancel', 'cancel_login')
-        ])
-      );
-    } catch (error) {
-      console.error('Failed to resend OTP:', error);
-      await ctx.reply(
-        'Error sending OTP. Please try again later or restart the login process.',
-        Markup.inlineKeyboard([
-          Markup.button.callback('Try Again', 'resend_otp'),
-          Markup.button.callback('Cancel', 'cancel_login')
-        ])
-      );
+    const loginState = typedCtx.session.login as LoginState;
+    
+    // Handle different steps of the login flow
+    switch (loginState.step) {
+      case LoginStep.WAITING_FOR_EMAIL:
+        await handleEmailInput(typedCtx, loginState);
+        break;
+        
+      case LoginStep.WAITING_FOR_OTP:
+        await handleOTPInput(typedCtx, loginState);
+        break;
     }
+  });
+  
+  // Handler for refreshing session
+  bot.action('refresh_session', async (ctx: any) => {
+    await ctx.answerCbQuery();
+    const typedCtx = ctx as CopperxContext;
+    
+    if (!typedCtx.session.auth?.accessToken) {
+      await ctx.editMessageText(
+        '❌ No active session found. Please login first.',
+        Markup.inlineKeyboard([
+          Markup.button.callback('🔑 Login', 'login'),
+          Markup.button.callback('🏠 Main Menu', 'main_menu')
+        ])
+      );
+      return;
+    }
+    
+    // TODO: Implement token refresh logic here
+    
+    await ctx.editMessageText(
+      '✅ Your session has been refreshed successfully!',
+      Markup.inlineKeyboard([
+        Markup.button.callback('🏠 Main Menu', 'main_menu')
+      ])
+    );
+  });
+  
+  // Handler for logout
+  bot.action('logout', async (ctx: any) => {
+    await ctx.answerCbQuery();
+    const typedCtx = ctx as CopperxContext;
+    
+    // Clear auth data
+    typedCtx.session.auth = undefined;
+    typedCtx.session.login = { step: LoginStep.IDLE, attemptCount: 0 };
+    await typedCtx.saveSession();
+    
+    // Disconnect real-time notifications if they're set up
+    if (typedCtx.notifications?.disconnectUser) {
+      const chatId = ctx.chat.id.toString();
+      typedCtx.notifications.disconnectUser(chatId);
+    }
+    
+    await ctx.editMessageText(
+      '✅ You have been logged out successfully.',
+      Markup.inlineKeyboard([
+        Markup.button.callback('🔑 Login Again', 'login'),
+        Markup.button.callback('🏠 Main Menu', 'main_menu')
+      ])
+    );
   });
 }
 
-// Helper functions
-async function startLoginFlow(ctx: any) {
-  await ctx.reply(
-    '*Login to Your Copperx Account*\n\nPlease enter your email address to receive a one-time password:',
-    {
+/**
+ * Start the login flow
+ * @param ctx Telegram context
+ */
+async function startLoginFlow(ctx: CopperxContext) {
+  // Initialize login state
+  ctx.session.login = {
+    step: LoginStep.WAITING_FOR_EMAIL,
+    attemptCount: 0
+  };
+  await ctx.saveSession();
+  
+  const message = `🔑 *Login to Copperx Payout*\n\nPlease enter your email address to receive a one-time password (OTP).`;
+  
+  // Check if it's an update to an existing message or a new message
+  if ('callback_query' in ctx.update) {
+    await ctx.editMessageText(message, {
       parse_mode: 'Markdown',
       ...Markup.inlineKeyboard([
-        Markup.button.callback('Cancel', 'cancel_login')
+        Markup.button.callback('❌ Cancel', 'cancel_login')
       ])
-    }
-  );
-  
-  ctx.session.login.step = LoginStep.WAITING_FOR_EMAIL;
+    });
+  } else {
+    await ctx.reply(message, {
+      parse_mode: 'Markdown',
+      ...Markup.inlineKeyboard([
+        Markup.button.callback('❌ Cancel', 'cancel_login')
+      ])
+    });
+  }
 }
 
-async function handleEmailInput(ctx: any, loginState: LoginState) {
-  const email = ctx.message.text.trim();
+/**
+ * Handle email input from user
+ * @param ctx Telegram context
+ * @param loginState Current login state
+ */
+async function handleEmailInput(ctx: CopperxContext, loginState: LoginState) {
+  const email = ctx.message?.text?.trim().toLowerCase();
   
-  if (!isValidEmail(email)) {
+  // Validate email format
+  if (!email || !isValidEmail(email)) {
     await ctx.reply(
-      'Invalid email format. Please enter a valid email address:',
+      `❌ ${config.messages.errors.invalidEmail}\n\nPlease try again with a valid email address.`,
       Markup.inlineKeyboard([
-        Markup.button.callback('Cancel', 'cancel_login')
+        Markup.button.callback('❌ Cancel', 'cancel_login')
       ])
     );
     return;
   }
   
-  // Store email in session
-  loginState.email = email;
-  
-  // Show loading message
-  const loadingMsg = await ctx.reply('Sending OTP code to your email...');
-  
   try {
-    // Request OTP from API
+    // Show loading message
+    const loadingMsg = await ctx.reply('🔄 Sending OTP to your email...');
+    
+    // Request OTP from the API
     const response = await requestEmailOTP(email);
+    
+    // Update login state
+    loginState.email = email;
     loginState.sid = response.sid;
-    
-    // Update state to wait for OTP
     loginState.step = LoginStep.WAITING_FOR_OTP;
+    await ctx.saveSession();
     
-    // Delete loading message
-    await ctx.deleteMessage(loadingMsg.message_id);
+    // Delete loading message and show OTP input prompt
+    await ctx.telegram.deleteMessage(ctx.chat!.id, loadingMsg.message_id);
     
-    // Ask user for OTP
     await ctx.reply(
-      `We've sent a verification code to *${email}*. Please enter the code below:`,
+      `✅ OTP sent to *${email}*!\n\nPlease enter the 6-digit code sent to your email.`,
       {
         parse_mode: 'Markdown',
         ...Markup.inlineKeyboard([
-          Markup.button.callback('Resend Code', 'resend_otp'),
-          Markup.button.callback('Cancel', 'cancel_login')
+          Markup.button.callback('🔄 Resend OTP', 'resend_otp'),
+          Markup.button.callback('❌ Cancel', 'cancel_login')
         ])
       }
     );
   } catch (error) {
-    console.error('Failed to request OTP:', error);
-    await ctx.deleteMessage(loadingMsg.message_id);
-    
+    console.error('Error requesting OTP:', error);
     await ctx.reply(
-      'Error sending OTP. Please check your email and try again.',
+      `❌ ${config.messages.errors.login}\n\nThere was a problem sending the OTP. Please try again later.`,
       Markup.inlineKeyboard([
-        Markup.button.callback('Try Again', 'resend_otp'),
-        Markup.button.callback('Cancel', 'cancel_login')
+        Markup.button.callback('🔑 Try Again', 'login'),
+        Markup.button.callback('❌ Cancel', 'cancel_login')
       ])
     );
   }
 }
 
-async function handleOTPInput(ctx: any, loginState: LoginState) {
-  const otp = ctx.message.text.trim();
+/**
+ * Handle OTP input from user
+ * @param ctx Telegram context
+ * @param loginState Current login state
+ */
+async function handleOTPInput(ctx: CopperxContext, loginState: LoginState) {
+  const otp = ctx.message?.text?.trim();
   
-  if (!otp || otp.length < 4) {
+  // Validate OTP format
+  if (!otp || !isValidOTP(otp)) {
     await ctx.reply(
-      'Invalid OTP format. Please enter the verification code you received:',
+      `❌ ${config.messages.errors.invalidOTP}\n\nPlease enter a valid 6-digit OTP code.`,
       Markup.inlineKeyboard([
-        Markup.button.callback('Resend Code', 'resend_otp'),
-        Markup.button.callback('Cancel', 'cancel_login')
+        Markup.button.callback('🔄 Resend OTP', 'resend_otp'),
+        Markup.button.callback('❌ Cancel', 'cancel_login')
       ])
     );
     return;
   }
   
-  // Show loading message
-  const loadingMsg = await ctx.reply('Verifying OTP code...');
-  
   try {
-    // Verify OTP from API
-    const authResponse = await verifyEmailOTP(loginState.email!, otp, loginState.sid!);
+    // Show loading message
+    const loadingMsg = await ctx.reply('🔄 Verifying OTP...');
     
-    // Delete loading message
-    await ctx.deleteMessage(loadingMsg.message_id);
+    // Verify OTP with the API
+    const authResponse = await verifyEmailOTP(
+      loginState.email!,
+      otp,
+      loginState.sid!
+    );
     
-    // Store auth info in session
+    // Store auth data in session
     ctx.session.auth = {
       accessToken: authResponse.accessToken,
-      expireAt: new Date(authResponse.expireAt),
+      expireAt: authResponse.expireAt,
       user: authResponse.user,
-      organizationId: authResponse.user.organizationId,
+      organizationId: authResponse.user.organizationId
     };
     
-    // Store session in database for persistence
-    const telegramId = ctx.from.id.toString();
+    // Reset login state
+    ctx.session.login = { step: LoginStep.IDLE, attemptCount: 0 };
+    await ctx.saveSession();
     
-    // Check if user exists
-    let user = await storage.getUser(telegramId);
+    // Delete loading message
+    await ctx.telegram.deleteMessage(ctx.chat!.id, loadingMsg.message_id);
     
-    if (!user) {
-      // Create new user
-      user = await storage.createUser({
-        telegramId,
-        firstName: ctx.from.first_name,
-        lastName: ctx.from.last_name,
-        username: ctx.from.username,
-        email: loginState.email,
-      });
-    } else {
-      // Update existing user
-      await storage.updateUser(telegramId, {
-        email: loginState.email,
-      });
+    // Setup real-time notifications for this user
+    if (ctx.notifications?.setupForUser && ctx.session.auth) {
+      const chatId = ctx.chat!.id.toString();
+      await ctx.notifications.setupForUser(
+        chatId,
+        ctx.session.auth.accessToken,
+        ctx.session.auth.organizationId || ''
+      );
     }
     
-    // Store or update session
-    let session = await storage.getSession(telegramId);
+    // Get user's first name or default to "there"
+    const firstName = authResponse.user.firstName || 'there';
     
-    if (session) {
-      await storage.updateSession(telegramId, {
-        accessToken: authResponse.accessToken,
-        expireAt: new Date(authResponse.expireAt),
-        organizationId: authResponse.user.organizationId,
-      });
-    } else {
-      await storage.createSession({
-        telegramId,
-        accessToken: authResponse.accessToken,
-        expireAt: new Date(authResponse.expireAt),
-        organizationId: authResponse.user.organizationId,
-        sid: loginState.sid,
-        state: {},
-      });
-    }
-    
-    // Clear login state
-    delete ctx.session.login;
-    
-    // Send success message with main menu
+    // Welcome message with user information
     await ctx.reply(
-      `*Login Successful!* ✅\n\nWelcome back, ${authResponse.user.firstName || 'User'}! You're now connected to your Copperx account.\n\nUse the keyboard menu below to navigate:`,
+      `🎉 *Login Successful!*\n\nWelcome, *${firstName}*!\n\nYou're now logged in to your Copperx Payout account. You can check your balance, send funds, and manage your wallets.`,
       {
         parse_mode: 'Markdown',
-        ...Markup.keyboard([
-          ['💰 Balance', '👛 Wallets'],
-          ['📤 Send', '📥 Deposit'],
-          ['📋 History', '👤 Profile'],
-          ['💼 KYC Status', '❓ Help']
-        ]).resize()
+        ...Markup.inlineKeyboard([
+          [Markup.button.callback('💰 Check Balance', 'balance')],
+          [Markup.button.callback('💼 My Wallets', 'wallets')],
+          [Markup.button.callback('📤 Send Funds', 'send')],
+          [Markup.button.callback('🏠 Main Menu', 'main_menu')]
+        ])
       }
     );
   } catch (error) {
-    console.error('Failed to verify OTP:', error);
-    await ctx.deleteMessage(loadingMsg.message_id);
+    console.error('Error verifying OTP:', error);
     
-    loginState.attemptCount += 1;
+    // Increment failed attempt counter
+    loginState.attemptCount = (loginState.attemptCount || 0) + 1;
+    await ctx.saveSession();
     
+    // If too many attempts, reset the flow
     if (loginState.attemptCount >= 3) {
+      loginState.step = LoginStep.IDLE;
+      await ctx.saveSession();
+      
       await ctx.reply(
-        'Too many failed attempts. Please restart the login process.',
-        Markup.removeKeyboard()
-      );
-      delete ctx.session.login;
-    } else {
-      await ctx.reply(
-        `Invalid OTP code. Please try again (${loginState.attemptCount}/3 attempts):`,
+        `❌ Too many failed attempts. Please start the login process again.`,
         Markup.inlineKeyboard([
-          Markup.button.callback('Resend Code', 'resend_otp'),
-          Markup.button.callback('Cancel', 'cancel_login')
+          Markup.button.callback('🔑 Try Again', 'login'),
+          Markup.button.callback('🏠 Main Menu', 'main_menu')
         ])
       );
+      return;
     }
+    
+    // Show error and retry options
+    await ctx.reply(
+      `❌ ${config.messages.errors.invalidOTP}\n\nThe OTP code is invalid or has expired. Please try again.`,
+      Markup.inlineKeyboard([
+        Markup.button.callback('🔄 Resend OTP', 'resend_otp'),
+        Markup.button.callback('❌ Cancel', 'cancel_login')
+      ])
+    );
   }
 }

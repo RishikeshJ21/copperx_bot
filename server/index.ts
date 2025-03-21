@@ -53,7 +53,8 @@ async function main() {
     
     // Start the Telegram bot
     try {
-      if (!config.bot.token) {
+      // Check if TELEGRAM_BOT_TOKEN exists in environment
+      if (!process.env.TELEGRAM_BOT_TOKEN) {
         console.warn("No Telegram bot token provided. Please set TELEGRAM_BOT_TOKEN in your environment variables.");
       } else {
         await startBot();

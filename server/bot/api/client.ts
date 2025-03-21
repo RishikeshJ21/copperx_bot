@@ -10,54 +10,60 @@ export const apiRequest = async <T>(options: {
   url: string;
   data?: any;
   params?: any;
-  accessToken?: string;
   headers?: Record<string, string>;
+  accessToken?: string;
+  baseURL?: string;
+  timeout?: number;
 }): Promise<T> => {
   try {
-    const { method, url, data, params, accessToken, headers = {} } = options;
-    
-    // Configure request headers
-    const requestHeaders: Record<string, string> = {
+    // Set up headers
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...headers
+      ...options.headers || {},
     };
-    
+
     // Add authorization header if access token is provided
-    if (accessToken) {
-      requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+    if (options.accessToken) {
+      headers['Authorization'] = `Bearer ${options.accessToken}`;
     }
-    
-    // Build the request configuration
+
+    // Create request config
     const requestConfig: AxiosRequestConfig = {
-      method,
-      url: `${config.api.baseUrl}${url}`,
-      headers: requestHeaders,
-      params
+      method: options.method,
+      url: options.url,
+      baseURL: options.baseURL || config.api.baseURL,
+      timeout: options.timeout || config.api.timeout,
+      headers,
     };
-    
-    // Add data for non-GET requests
-    if (method !== 'GET' && data) {
-      requestConfig.data = data;
+
+    // Add data or params if provided
+    if (options.data) {
+      requestConfig.data = options.data;
     }
-    
-    // Make the API request
+    if (options.params) {
+      requestConfig.params = options.params;
+    }
+
+    // Make the request
     const response = await axios(requestConfig);
     
-    // Return the data from the response
+    // Return the data
     return response.data;
   } catch (error: any) {
-    // Handle errors
-    console.error(`API Error: ${options.method} ${options.url}`, error.message);
-    
-    // If there's a response, log it
+    // Check if this is an Axios error with a response
     if (error.response) {
-      console.error('Error response:', error.response.data);
-      
-      // Throw the response data if it exists
-      throw error.response.data || error;
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error(`API Error (${error.response.status}):`, error.response.data);
+      throw new Error(error.response.data?.message || `API Error ${error.response.status}: ${error.response.statusText}`);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('API Request Error:', error.request);
+      throw new Error('No response received from API. Please check your connection.');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('API Config Error:', error.message);
+      throw new Error(`API request failed: ${error.message}`);
     }
-    
-    // If there's no response, throw the original error
-    throw error;
   }
 };
