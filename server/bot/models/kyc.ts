@@ -99,10 +99,13 @@ export interface KycStatusResponse {
   status: KycStatusType;
   level?: string | number;
   verificationDate?: string;
+  expiryDate?: string;
   provider?: string;
   limits?: KycLimits;
   availableServices?: string[];
   message?: string;
+  rejectionReason?: string;
+  nextSteps?: string[];
 }
 
 /**

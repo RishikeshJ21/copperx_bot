@@ -96,4 +96,12 @@ export interface WalletOperationResponse {
 export interface WalletBalanceResponse {
   items: WalletBalance[];
   total: number;
+  
+  // Adding array-like interface to make it easier to use with existing code
+  length?: number;
+  [index: number]: WalletBalance;
+  map?: <T>(callbackfn: (value: WalletBalance, index: number, array: WalletBalance[]) => T) => T[];
+  filter?: (predicate: (value: WalletBalance) => boolean) => WalletBalance[];
+  find?: (predicate: (value: WalletBalance) => boolean) => WalletBalance | undefined;
+  reduce?: <T>(callbackfn: (accumulator: T, current: WalletBalance) => T, initialValue: T) => T;
 }

@@ -17,7 +17,7 @@ export async function getKycStatus(accessToken: string, email: string) {
   try {
     return await apiRequest<KycStatusResponse>({
       method: 'GET',
-      url: `/api/kycs/status`,
+      url: `/api/kycs/status/${encodeURIComponent(email)}`,
       accessToken
     });
   } catch (error: any) {
