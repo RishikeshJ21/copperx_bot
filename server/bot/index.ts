@@ -1,8 +1,10 @@
-import { Telegraf } from 'telegraf';
+import { Telegraf, Scenes, session } from 'telegraf';
 import { registerCommands } from './commands';
 import { setupMiddleware } from './middleware/session';
 import { setupPusherNotifications } from './api/notification';
 import { config } from './config';
+import { CopperxContext } from './models';
+import { setupScenes } from './scenes';
 
 /**
  * Initializes and configures the Telegram bot
@@ -18,10 +20,16 @@ export function initializeBot(): Telegraf {
   }
   
   // Create bot instance
-  const bot = new Telegraf(botToken);
+  const bot = new Telegraf<CopperxContext>(botToken);
   
   // Set up session middleware
   bot.use(setupMiddleware());
+  
+  // Set up built-in session middleware for scene management
+  bot.use(session());
+  
+  // Initialize and set up scenes
+  setupScenes(bot);
   
   // Register all commands
   registerCommands(bot);

@@ -7,7 +7,8 @@ import {
   createConfirmButtons, 
   createWalletNetworkButtons
 } from '../utils/markup';
-import { getWalletBalances, getTransferFee, sendFunds } from '../api/transfer';
+import { getTransferFee, sendFunds } from '../api/transfer';
+import { getWalletBalances } from '../api/wallet';
 import { requireAuth } from '../middleware/auth';
 
 // Define scene state interface

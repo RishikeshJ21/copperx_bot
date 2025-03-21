@@ -39,6 +39,10 @@ export interface CopperxContext extends Context {
   // Session saver function
   saveSession: () => Promise<void>;
   
+  // Scene management
+  scene: Scenes.SceneContextScene<CopperxContext, SceneSessionData>;
+  wizard: Scenes.WizardContextWizard<CopperxContext>;
+  
   // Command handlers (added as shortcuts)
   command?: {
     start: () => Promise<void>;

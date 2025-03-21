@@ -1,5 +1,5 @@
 import { apiRequest } from './client';
-import { WalletBalance, TokenBalance, WalletOperationResponse, DepositAddress } from '../models/wallet';
+import { WalletBalance, TokenBalance, WalletOperationResponse, DepositAddress, WalletBalanceResponse } from '../models/wallet';
 
 /**
  * Get deposit address for a specific network
@@ -28,7 +28,7 @@ export async function getDepositAddress(accessToken: string, network: string) {
  * @param accessToken User's access token
  * @returns Wallet balances across networks
  */
-export async function getWalletBalances(accessToken: string) {
+export async function getWalletBalances(accessToken: string): Promise<WalletBalanceResponse> {
   try {
     const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
@@ -36,7 +36,12 @@ export async function getWalletBalances(accessToken: string) {
       accessToken
     });
     
-    return response || [];
+    // Format the response to match expected structure
+    const balances = response || [];
+    return {
+      items: balances,
+      total: balances.length
+    };
   } catch (error: any) {
     console.error('Failed to get wallet balances:', error);
     throw new Error(`Failed to retrieve wallet balances: ${error.message}`);
@@ -68,9 +73,9 @@ export async function setDefaultWallet(accessToken: string, walletId: string) {
  * @param accessToken User's access token
  * @returns Default wallet information
  */
-export async function getDefaultWallet(accessToken: string) {
+export async function getDefaultWallet(accessToken: string): Promise<WalletBalance> {
   try {
-    return await apiRequest<any>({
+    return await apiRequest<WalletBalance>({
       method: 'GET',
       url: '/api/wallets/default',
       accessToken
@@ -86,7 +91,7 @@ export async function getDefaultWallet(accessToken: string) {
  * @param accessToken User's access token
  * @returns Token balance
  */
-export async function getDefaultWalletBalance(accessToken: string) {
+export async function getDefaultWalletBalance(accessToken: string): Promise<TokenBalance> {
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
@@ -104,15 +109,20 @@ export async function getDefaultWalletBalance(accessToken: string) {
  * @param accessToken User's access token
  * @returns All user wallets
  */
-export async function getAllWallets(accessToken: string) {
+export async function getAllWallets(accessToken: string): Promise<WalletBalanceResponse> {
   try {
-    const response = await apiRequest<any[]>({
+    const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
       url: '/api/wallets',
       accessToken
     });
     
-    return response || [];
+    // Format the response to match expected structure
+    const wallets = response || [];
+    return {
+      items: wallets,
+      total: wallets.length
+    };
   } catch (error: any) {
     console.error('Failed to get all wallets:', error);
     throw new Error(`Failed to retrieve wallets: ${error.message}`);
@@ -124,7 +134,7 @@ export async function getAllWallets(accessToken: string) {
  * @param accessToken User's access token
  * @returns List of supported networks
  */
-export async function getSupportedNetworks(accessToken: string) {
+export async function getSupportedNetworks(accessToken: string): Promise<string[]> {
   try {
     return await apiRequest<string[]>({
       method: 'GET',
@@ -144,7 +154,7 @@ export async function getSupportedNetworks(accessToken: string) {
  * @param token Token address or symbol
  * @returns Token balance
  */
-export async function getTokenBalance(accessToken: string, chainId: string, token: string) {
+export async function getTokenBalance(accessToken: string, chainId: string, token: string): Promise<TokenBalance> {
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
