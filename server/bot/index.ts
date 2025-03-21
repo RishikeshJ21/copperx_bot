@@ -10,7 +10,7 @@ import { setupScenes } from './scenes';
  * Initializes and configures the Telegram bot
  * @returns Configured Telegraf instance
  */
-export function initializeBot(): Telegraf {
+export function initializeBot(): Telegraf<CopperxContext> {
   // Get bot token from environment variables
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   

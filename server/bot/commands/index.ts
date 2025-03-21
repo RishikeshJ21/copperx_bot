@@ -1,4 +1,5 @@
 import { Telegraf } from 'telegraf';
+import { CopperxContext } from '../models';
 import { registerStartCommand } from './start';
 import { registerLoginCommand } from './login';
 import { registerHelpCommand } from './help';
@@ -10,12 +11,13 @@ import { registerDepositCommand } from './deposit';
 import { registerHistoryCommand } from './history';
 import { registerKycCommand } from './kyc';
 import { registerProfileCommand } from './profile';
+import { showMainMenu } from './menu';
 
 /**
  * Registers all available commands with the bot
  * @param bot Telegraf bot instance
  */
-export function registerCommands(bot: Telegraf) {
+export function registerCommands(bot: Telegraf<CopperxContext>) {
   // Register bot commands
   registerStartCommand(bot);
   registerLoginCommand(bot);
@@ -28,6 +30,12 @@ export function registerCommands(bot: Telegraf) {
   registerHistoryCommand(bot);
   registerKycCommand(bot);
   registerProfileCommand(bot);
+  
+  // Register global action handlers
+  bot.action('main_menu', async (ctx) => {
+    await ctx.answerCbQuery('Returning to main menu');
+    await showMainMenu(ctx);
+  });
   
   // Set up bot command list
   bot.telegram.setMyCommands([
@@ -45,7 +53,7 @@ export function registerCommands(bot: Telegraf) {
   ]);
   
   // Add generic error handler
-  bot.catch((err, ctx) => {
+  bot.catch((err: any, ctx: CopperxContext) => {
     console.error('Bot error:', err);
     ctx.reply(
       '❌ Something went wrong. Please try again or use /start to restart the bot.'
