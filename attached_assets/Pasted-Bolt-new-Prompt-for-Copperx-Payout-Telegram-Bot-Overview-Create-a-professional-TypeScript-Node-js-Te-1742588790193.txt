@@ -1,0 +1,553 @@
+Bolt.new Prompt for Copperx Payout Telegram Bot
+Overview
+Create a professional TypeScript/Node.js Telegram bot that integrates with Copperx Payout's API, allowing users to manage their stablecoin finances directly through Telegram. The bot should implement all core features outlined in the Copperx Payout API documentation.
+Technical Requirements
+
+Use TypeScript with Node.js for strong type safety
+Implement clean architecture with separation of concerns:
+
+API service layer
+Authentication management
+Command handling
+User state management
+Response formatting
+
+
+Include comprehensive error handling and user feedback
+Implement secure credential management
+Add real-time notification support using Pusher
+
+Core Features
+Authentication & User Management
+
+Allow users to authenticate with their Copperx credentials
+Implement email OTP login flow
+Store and refresh access tokens securely
+Display user profile and KYC status information
+Redirect users to platform for KYC completion if not approved
+
+Wallet Management
+
+Show wallet balances across different networks
+Allow users to set a default wallet
+Display transaction history with pagination
+Generate deposit addresses and instructions
+
+Fund Transfer Operations
+
+Send funds to email addresses
+Send funds to external wallet addresses
+Withdraw funds to bank accounts
+View recent transactions
+Display fee information before confirming transactions
+
+Notifications
+
+Set up real-time deposit notifications using Pusher
+Format and send transaction alerts to users
+
+Bot Command Structure
+
+Implement an intuitive command menu
+Create interactive keyboards for navigation
+Add help commands and guided flows
+Support conversation-based interactions
+
+Detailed Implementation Instructions
+CopyCreate a Telegram bot that integrates with the Copperx Payout API and follows these architectural principles:
+
+1. Project structure:
+   - src/
+     - api/            # API service layer for Copperx Payout integration
+     - commands/       # Bot command handlers
+     - middleware/     # Authentication and state middleware
+     - models/         # TypeScript interfaces and types
+     - utils/          # Helper functions
+     - config.ts       # Configuration management
+     - bot.ts          # Main bot initialization
+     - index.ts        # Entry point
+
+2. API integration:
+   - Implement a service for each API category (auth, wallet, transfer, etc.)
+   - Use Axios for HTTP requests with interceptors for token management
+   - Add proper error handling and response parsing
+
+3. Authentication flow:
+   - Store user tokens securely
+   - Implement email OTP verification process
+   - Handle token refresh automatically
+   - Maintain user session state
+
+4. Command structure:
+   - /start - Initial greeting and instructions
+   - /login - Start the authentication flow
+   - /balance - View wallet balances
+   - /send - Send funds (with interactive prompts)
+   - /withdraw - Withdraw to wallet or bank
+   - /history - View transaction history
+   - /deposit - Get deposit instructions
+   - /settings - Change default wallet, notification preferences
+   - /help - Show available commands
+
+5. User experience:
+   - Implement inline keyboards for navigation
+   - Add conversation flows with step-by-step prompts
+   - Include confirmation steps for transactions
+   - Format currency values properly
+   - Show helpful error messages
+
+6. Notification system:
+   - Integrate Pusher for real-time deposit notifications
+   - Format and send transaction alerts
+   - Allow users to toggle notification preferences
+
+7. Security:
+   - Never store plaintext credentials
+   - Implement session timeouts
+   - Add transaction confirmation steps
+   - Validate all user inputs
+
+8. Error handling:
+   - Friendly error messages for users
+   - Detailed logging for debugging
+   - Graceful fallbacks for API failures
+   - Rate limit handling
+
+Generate this project using TypeScript, Node.js, and the grammy or telegraf library for Telegram bot development. Ensure all API endpoints from the Copperx Payout documentation are properly integrated.
+Implementation Details
+When implementing the bot, focus on these key aspects:
+
+Authentication Flow:
+
+Initialize with /start command showing bot capabilities
+Guide users through email OTP login using the /api/auth/email-otp/request and /api/auth/email-otp/authenticate endpoints
+Store tokens securely and handle refreshing as needed
+
+
+Wallet Management:
+
+Fetch wallet balances from /api/wallets/balances
+Allow setting default wallet with /api/wallets/default
+Show transaction history with pagination using /api/transfers
+
+
+Transfer Functionality:
+
+Implement step-by-step conversation flows for sending money
+Use inline keyboards for selecting recipients and amounts
+Add confirmation steps showing fees before finalizing transactions
+Support email transfers (/api/transfers/send), wallet withdrawals (/api/transfers/wallet-withdraw), and bank withdrawals (/api/transfers/offramp)
+
+
+Real-time Notifications:
+
+Set up Pusher client as described in the documentation
+Authenticate with /api/notifications/auth
+Subscribe to the appropriate private channel (private-org-${organizationId})
+Format and forward deposit notifications to users
+
+
+User Experience:
+
+Create intuitive navigation with inline keyboards
+Format currency values and transaction details clearly
+Provide helpful responses and error messages
+Include loading indicators for API operations
+
+
+
+This approach will create a professional, user-friendly Telegram bot that provides full access to the Copperx Payout platform's functionality while maintaining security and usability best practices.RetryErrors
+Hide
+ 
+Resolver error at paths./api/transfers.get.parameters.7.schema.$ref
+Could not resolve reference: Could not resolve pointer: /components/schemas/Date does not exist in document
+Resolver error at paths./api/transfers.get.parameters.8.schema.$ref
+Could not resolve reference: Could npastedJadd more features like kyc and all things which can be added and details how and what will be in the payload and response from the docsEditBolt.new Prompt for Copperx Payout Telegram Bot
+Overview
+Create a comprehensive TypeScript/Node.js Telegram bot that integrates with Copperx Payout's API, allowing users to manage their stablecoin finances directly through Telegram. The bot should implement all core features outlined in the Copperx Payout API documentation including authentication, wallet management, transfers, KYC status management, and real-time notifications.
+Technical Requirements
+
+Use TypeScript with Node.js for strong type safety
+Implement clean architecture with separation of concerns:
+
+API service layer
+Authentication management
+Command handling
+User state management
+Session persistence
+Response formatting
+
+
+Include comprehensive error handling with user-friendly messages
+Implement secure credential management and token storage
+Add real-time notification support using Pusher
+
+Core Features
+Authentication & User Management
+
+Allow users to authenticate with their Copperx credentials using email OTP
+Securely store and refresh access tokens
+Display user profile information
+Check KYC/KYB approval status and redirect to platform if needed
+Implement session timeout handling
+
+Wallet Management
+
+Show wallet balances across different networks (Polygon, Solana, etc.)
+Allow users to set a default wallet
+Generate wallet addresses for deposits
+Display transaction history with filtering and pagination options
+Show token balances for specific chains
+
+Fund Transfer Operations
+
+Send funds to email addresses
+Send funds to external wallet addresses
+Withdraw funds to bank accounts
+Bridge tokens between networks
+Create and view deposit accounts
+Display fee information before confirming transactions
+Support batch transfers to multiple recipients
+Show transaction status updates
+
+KYC Status Management
+
+Check KYC status and show verification details
+Guide users through the KYC submission process if not verified
+Display provider information and supported routes
+Show available payment routes based on KYC status
+
+Payee Management
+
+List saved payees/recipients
+Add new payees with contact information
+Manage bank account details for payees
+Search and select payees during transfers
+
+Scheduled Transfers
+
+Create recurring transfers
+Manage transfer schedules (daily/weekly/monthly)
+View and deactivate scheduled transfers
+
+Notifications
+
+Set up real-time deposit notifications using Pusher
+Format and send transaction alerts to users
+Notify users about KYC status changes
+
+Detailed Implementation Instructions
+CopyCreate a Telegram bot that integrates with the Copperx Payout API and follows these architectural principles:
+
+1. Project structure:
+   - src/
+     - api/               # API service layer for Copperx integration
+       - auth.ts          # Authentication services
+       - wallet.ts        # Wallet operations
+       - transfer.ts      # Transfer functionality
+       - kyc.ts           # KYC/KYB services
+       - notifications.ts # Notification services
+       - payee.ts         # Payee management
+       - schedule.ts      # Scheduled transfers
+     - commands/          # Bot command handlers
+     - middleware/        # Authentication and state middleware
+     - models/            # TypeScript interfaces and types
+     - utils/             # Helper functions
+     - config.ts          # Configuration management
+     - bot.ts             # Main bot initialization
+     - index.ts           # Entry point
+
+2. API integration:
+   - Implement a service for each API category
+   - Use Axios for HTTP requests with interceptors for token management
+   - Add proper error handling and response parsing
+   - Type all request/response objects based on API documentation
+
+3. Authentication flow:
+   - Implement email OTP verification process using:
+     - POST /api/auth/email-otp/request
+     - POST /api/auth/email-otp/authenticate
+   - Store tokens securely with token refresh handling
+   - Maintain user session state between interactions
+   - Handle token expiration gracefully
+
+4. Command structure:
+   - /start - Initial greeting and instructions
+   - /login - Start the authentication flow
+   - /profile - View user profile information
+   - /kyc - Check KYC status
+   - /balance - View wallet balances
+   - /wallets - Manage wallets and set default
+   - /send - Send funds with interactive prompts
+   - /withdraw - Withdraw to wallet or bank account
+   - /deposit - Get deposit instructions
+   - /bridge - Bridge tokens between networks
+   - /history - View transaction history with filtering
+   - /payees - Manage recipient information
+   - /schedule - Manage scheduled transfers
+   - /settings - Manage preferences
+   - /help - Show available commands and instructions
+
+5. User experience:
+   - Implement inline keyboards for navigation
+   - Create conversation flows with step-by-step prompts
+   - Add confirmation steps for transactions showing fees
+   - Format currency values and transaction details clearly
+   - Show loading indicators for API operations
+   - Include back/cancel options in all flows
+
+6. KYC integration:
+   - Check KYC status using provider endpoints
+   - Display appropriate guidance based on verification status
+   - Show available routes based on KYC level
+   - Link to web platform for completing verification if needed
+
+7. Wallet management:
+   - Fetch wallet balances across networks using /api/wallets/balances
+   - Allow setting default wallet with /api/wallets/default
+   - Support wallet generation for different networks
+   - Display balance for specific tokens and chains
+
+8. Transfer functionality:
+   - Email transfers: Implement conversation flow using /api/transfers/send
+   - Wallet withdrawals: Support external withdrawals with /api/transfers/wallet-withdraw
+   - Bank withdrawals: Implement offramp with /api/transfers/offramp
+   - Bridge operations: Support cross-chain transfers with /api/transfers/bridge
+   - Batch transfers: Allow sending to multiple recipients with /api/transfers/send-batch
+   - Quote fetching: Get fee estimates before transfers with /api/quotes endpoints
+
+9. Notification system:
+   - Integrate Pusher for real-time deposit notifications
+   - Authenticate with /api/notifications/auth
+   - Subscribe to the appropriate private channel (private-org-${organizationId})
+   - Format and forward deposit notifications to users
+
+10. Payee management:
+    - List payees with /api/payees
+    - Add new payees with /api/payees
+    - Update existing payee information
+    - Search and select payees during transfers
+
+11. Scheduled transfers:
+    - Create schedules with /api/transfer-schedules
+    - List active schedules
+    - Support deactivation of schedules
+
+12. Security:
+    - Never store plaintext credentials
+    - Implement session timeouts
+    - Add transaction confirmation steps
+    - Validate all user inputs
+    - Use secure storage for tokens
+
+13. Error handling:
+    - Provide user-friendly error messages
+    - Implement detailed logging
+    - Add graceful fallbacks for API failures
+    - Handle rate limits appropriately
+
+Generate this project using TypeScript, Node.js, and the grammy or telegraf library for Telegram bot development. Ensure all API endpoints from the Copperx Payout documentation are properly integrated and typed.
+Implementation Details for Key Features
+Authentication Flow
+typescriptCopy// Example payload and response for authentication
+// Step 1: Request OTP
+// POST /api/auth/email-otp/request
+const requestOtpPayload = {
+  email: "user@example.com"
+};
+
+// Response
+const otpRequestResponse = {
+  email: "user@example.com",
+  sid: "session_identifier_string"
+};
+
+// Step 2: Verify OTP
+// POST /api/auth/email-otp/authenticate
+const verifyOtpPayload = {
+  email: "user@example.com",
+  otp: "123456",
+  sid: "session_identifier_string"
+};
+
+// Response
+const authResponse = {
+  scheme: "Bearer",
+  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  accessTokenId: "token_id",
+  expireAt: "2023-04-15T12:00:00Z",
+  user: {
+    id: "user_id",
+    firstName: "John",
+    lastName: "Doe",
+    email: "user@example.com",
+    organizationId: "org_id",
+    // other user properties
+  }
+};
+KYC Status Check
+typescriptCopy// Example for retrieving KYC status
+// GET /api/providers
+// Response will include verification status
+const providersResponse = {
+  page: 1,
+  limit: 10,
+  count: 1,
+  hasMore: false,
+  data: [
+    {
+      id: "provider_id",
+      createdAt: "2023-01-01T00:00:00Z",
+      updatedAt: "2023-01-01T00:00:00Z",
+      organizationId: "org_id",
+      status: "pending", // or "approved", "rejected"
+      providerCode: "0x0",
+      providerData: {
+        kycUrl: "https://example.com/kyc",
+        tosUrl: "https://example.com/tos",
+        externalStatus: "PENDING"
+      },
+      externalKycId: "external_id",
+      externalCustomerId: "customer_id",
+      supportRemittance: true,
+      country: "USA"
+    }
+  ]
+};
+Wallet Balance Retrieval
+typescriptCopy// Example for retrieving wallet balances
+// GET /api/wallets/balances
+// Response contains balances across networks
+const walletsResponse = [
+  {
+    walletId: "wallet_id_1",
+    isDefault: true,
+    network: "Polygon",
+    balances: [
+      {
+        decimals: 6,
+        balance: "100.50",
+        symbol: "USDC",
+        address: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+      }
+    ]
+  },
+  {
+    walletId: "wallet_id_2",
+    isDefault: false,
+    network: "Solana",
+    balances: [
+      {
+        decimals: 6,
+        balance: "50.25",
+        symbol: "USDC",
+        address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      }
+    ]
+  }
+];
+Send Transfer
+typescriptCopy// Example for sending funds to email
+// POST /api/transfers/send
+const sendTransferPayload = {
+  email: "recipient@example.com",
+  amount: "50.00",
+  purposeCode: "self", // or other valid purpose codes
+  currency: "USD"
+};
+
+// Response includes transaction details
+const sendTransferResponse = {
+  id: "transfer_id",
+  createdAt: "2023-04-15T12:00:00Z",
+  updatedAt: "2023-04-15T12:00:00Z",
+  organizationId: "org_id",
+  status: "pending", // or other status values
+  type: "send",
+  amount: "50.00",
+  currency: "USD",
+  amountSubtotal: "50.00",
+  totalFee: "0.50",
+  feePercentage: "1.00",
+  feeCurrency: "USD",
+  purposeCode: "self",
+  // other transfer properties
+};
+Pusher Notification Setup
+typescriptCopy// Example for setting up Pusher notifications
+// First authenticate with the notification service
+// POST /api/notifications/auth
+const notificationAuthPayload = {
+  socket_id: "socket_id",
+  channel_name: `private-org-${organizationId}`
+};
+
+// Response contains auth info
+const notificationAuthResponse = {
+  auth: "auth_token_string",
+  user_data: "{\"id\":\"user_id\",\"user_info\":{\"name\":\"John Doe\",\"email\":\"user@example.com\"}}"
+};
+
+// Then subscribe to events
+// Example Pusher client setup
+const pusherClient = new Pusher('e089376087cac1a62785', {
+  cluster: 'ap1',
+  authorizer: (channel) => ({
+    authorize: async (socketId, callback) => {
+      try {
+        const response = await axios.post('/api/notifications/auth', {
+          socket_id: socketId,
+          channel_name: channel.name
+        }, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        
+        if (response.data) {
+          callback(null, response.data);
+        } else {
+          callback(new Error('Pusher authentication failed'), null);
+        }
+      } catch (error) {
+        console.error('Pusher authorization error:', error);
+        callback(error, null);
+      }
+    }
+  })
+});
+
+// Subscribe to channel and bind to events
+const channel = pusherClient.subscribe(`private-org-${organizationId}`);
+channel.bind('deposit', (data) => {
+  // Format and send notification to user
+  sendMessage(chatId, `💰 *New Deposit Received*\n\n${data.amount} USDC deposited on ${data.network}`);
+});
+Creating Scheduled Transfers
+typescriptCopy// Example for creating scheduled transfers
+// POST /api/transfer-schedules
+const scheduleTransferPayload = {
+  amount: "100.00",
+  purposeCode: "self",
+  email: "recipient@example.com", // or walletAddress for wallet transfers
+  repeatType: "daily", // or "weekly", "monthly"
+  schedule: "0 9 * * *" // cron format
+};
+
+// Response includes schedule details
+const scheduleTransferResponse = {
+  id: "schedule_id",
+  createdAt: "2023-04-15T12:00:00Z",
+  updatedAt: "2023-04-15T12:00:00Z",
+  organizationId: "org_id",
+  status: "active",
+  type: "on_ramp",
+  amount: "100.00",
+  currency: "USD",
+  purposeCode: "self",
+  email: "recipient@example.com",
+  repeatType: "daily",
+  schedule: "0 9 * * *"
+  // other schedule properties
+};
+This approach will create a professional, fully-featured Telegram bot that provides comprehensive access to the Copperx Payout platform's functionality while maintaining security and usability best practices. The bot will guide users through complex operations with intuitive conversation flows and provide real-time updates for their transactions.
