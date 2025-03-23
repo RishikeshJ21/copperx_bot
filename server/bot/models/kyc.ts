@@ -24,6 +24,7 @@ export enum KycStatusType {
   VERIFIED = 'verified',
   REJECTED = 'rejected',
   EXPIRED = 'expired',
+  MANUAL_REVIEW = 'manual_review',
 }
 
 /**

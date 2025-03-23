@@ -114,6 +114,8 @@ export function formatKycStatus(status: string): string {
       return '❌ Rejected';
     case 'expired':
       return '⚠️ Expired';
+    case 'manual_review':
+      return '👤 Manual Review';
     default:
       return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
   }

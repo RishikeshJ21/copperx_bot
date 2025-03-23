@@ -18,7 +18,7 @@ function createPusherClient(accessToken: string, organizationId: string) {
         try {
           // Authenticate with Copperx Pusher service
           const response = await axios.post(
-            `${config.api.baseUrl}${config.pusher.authEndpoint}`,
+            `${config.api.baseUrl}/api/${config.api.version}/pusher/auth`,
             {
               socket_id: socketId,
               channel_name: channel.name

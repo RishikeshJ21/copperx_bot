@@ -7,6 +7,7 @@ export const config = {
     baseURL: 'https://income-api.copperx.io',
     baseUrl: 'https://income-api.copperx.io', // Legacy reference, keeping both for compatibility
     timeout: 15000, // 15 seconds timeout for API requests
+    version: 'v1', // API version for endpoints
   },
   bot: {
     name: 'Copperx Payout Bot',
@@ -27,7 +28,7 @@ export const config = {
   pusher: {
     key: 'dfd03c59f991f1191e95',
     cluster: 'ap2',
-    authEndpoint: '/api/pusher/auth',
+    authEndpoint: '/api/v1/pusher/auth',
     app_id: '1963059',
     secret: 'bb3c20deb6ae8cdbe591',
   },

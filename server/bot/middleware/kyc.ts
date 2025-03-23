@@ -121,6 +121,8 @@ export const requireKycVerification: MiddlewareFn<CopperxContext> = async (ctx, 
       message += 'You need to complete KYC verification to access this feature. Please complete the verification process to unlock all features.';
     } else if (status === KycStatusType.PENDING.toLowerCase()) {
       message += 'Your KYC verification is pending. This feature will be unlocked once your verification is approved.';
+    } else if (status === KycStatusType.MANUAL_REVIEW.toLowerCase()) {
+      message += 'Your KYC verification is under manual review. This feature will be unlocked once your verification is approved by our team.';
     } else if (status === KycStatusType.REJECTED.toLowerCase()) {
       message += 'Your KYC verification was rejected. Please resubmit your verification details.';
     } else if (status === KycStatusType.EXPIRED.toLowerCase()) {
