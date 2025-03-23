@@ -29,14 +29,43 @@ export async function getDepositAddress(accessToken: string, network: string) {
  */
 export async function getWalletBalances(accessToken: string): Promise<WalletBalanceResponse> {
   try {
-    const response = await apiRequest<WalletBalance[]>({
+    console.log('Fetching wallet balances...');
+    const response = await apiRequest<any>({
       method: 'GET',
-      url: '/api/wallets/balances',
+      url: '/api/wallets',
       accessToken
     });
     
-    // Format the response to match expected structure
-    const balances = response || [];
+    console.log('Wallet API response:', JSON.stringify(response));
+    
+    // Handle multiple possible response formats
+    let balances: WalletBalance[] = [];
+    
+    if (Array.isArray(response)) {
+      // Direct array response
+      balances = response;
+    } else if (response && typeof response === 'object') {
+      // Object with items array
+      if (Array.isArray(response.items)) {
+        balances = response.items;
+      } else if (response.wallets && Array.isArray(response.wallets)) {
+        // Object with wallets array
+        balances = response.wallets;
+      }
+    }
+    
+    // Ensure each wallet has the required fields
+    balances = balances.map(wallet => ({
+      walletId: wallet.walletId || wallet.id || `wallet-${Math.random().toString(36).substring(2, 10)}`,
+      network: wallet.network || 'unknown',
+      balance: wallet.balance || '0',
+      isDefault: wallet.isDefault || false,
+      address: wallet.address || null,
+      tokenBalances: wallet.tokenBalances || []
+    }));
+    
+    console.log(`Processed ${balances.length} wallets`);
+    
     return {
       items: balances,
       total: balances.length

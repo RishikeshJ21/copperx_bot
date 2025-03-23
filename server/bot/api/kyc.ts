@@ -15,14 +15,26 @@ import {
  */
 export async function getKycStatus(accessToken: string, email: string) {
   try {
-    return await apiRequest<KycStatusResponse>({
+    console.log(`Getting KYC status for email: ${email}`);
+    const response = await apiRequest<KycStatusResponse>({
       method: 'GET',
       url: `/api/kyc/status`,
       params: { email },
       accessToken
     });
+    console.log('KYC status response:', JSON.stringify(response));
+    return response;
   } catch (error: any) {
     console.error('Failed to get KYC status:', error);
+    if (error.response?.status === 404) {
+      // If user's KYC info is not found, return a default "not started" status
+      return {
+        userEmail: email,
+        status: 'not_started',
+        message: 'KYC verification not started',
+        nextSteps: ['Complete KYC verification to unlock all features']
+      };
+    }
     throw new Error(`Failed to retrieve KYC status: ${error.message}`);
   }
 }
