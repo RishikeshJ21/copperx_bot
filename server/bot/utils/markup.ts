@@ -19,7 +19,10 @@ export function createMainMenuButtons() {
       Markup.button.callback('💼 Wallets', 'wallets')
     ],
     [
-      Markup.button.callback('👤 Profile', 'profile'),
+      Markup.button.callback('🏆 Points', 'points_menu'),
+      Markup.button.callback('👤 Profile', 'profile')
+    ],
+    [
       Markup.button.callback('📚 Help', 'help')
     ]
   ]);

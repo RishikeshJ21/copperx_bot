@@ -11,6 +11,7 @@ import { registerDepositCommand } from './deposit';
 import { registerHistoryCommand } from './history';
 import { registerKycCommand } from './kyc';
 import { registerProfileCommand } from './profile';
+import { registerPointsCommand } from './points';
 import { showMainMenu } from './menu';
 
 /**
@@ -30,6 +31,7 @@ export function registerCommands(bot: Telegraf<CopperxContext>) {
   registerHistoryCommand(bot);
   registerKycCommand(bot);
   registerProfileCommand(bot);
+  registerPointsCommand(bot);
   
   // Register global action handlers
   bot.action('main_menu', async (ctx) => {
@@ -47,6 +49,7 @@ export function registerCommands(bot: Telegraf<CopperxContext>) {
     { command: 'deposit', description: 'Get deposit address' },
     { command: 'history', description: 'View transaction history' },
     { command: 'wallets', description: 'Manage your wallets' },
+    { command: 'points', description: 'View and manage your points' },
     { command: 'kyc', description: 'Verify your identity' },
     { command: 'profile', description: 'View your profile' },
     { command: 'help', description: 'Show help message' }

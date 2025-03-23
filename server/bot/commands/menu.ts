@@ -18,10 +18,13 @@ export async function showMainMenu(ctx: CopperxContext): Promise<void> {
     ],
     [
       Markup.button.callback('📊 History', 'history'),
-      Markup.button.callback('👤 Profile', 'profile')
+      Markup.button.callback('🏆 Points', 'points_menu')
     ],
     [
-      Markup.button.callback('🆔 KYC', 'kyc'),
+      Markup.button.callback('👤 Profile', 'profile'),
+      Markup.button.callback('🆔 KYC', 'kyc')
+    ],
+    [
       Markup.button.callback('ℹ️ Help', 'help')
     ]
   ];
