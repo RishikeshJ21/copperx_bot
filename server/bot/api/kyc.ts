@@ -17,9 +17,9 @@ export async function getKycStatus(accessToken: string, email: string) {
   try {
     console.log(`Getting KYC status for email: ${email}`);
     
-    // First try the new endpoint
+    // First try the official documented endpoint
     try {
-      const response = await apiRequest<any>({
+      const response = await apiRequest<KycStatusResponse>({
         method: 'GET',
         url: `/api/kycs/status/${encodeURIComponent(email)}`,
         accessToken
@@ -27,25 +27,14 @@ export async function getKycStatus(accessToken: string, email: string) {
       
       console.log('KYC status response from /api/kycs/status:', response);
       
-      // The response may be a string status or an object
-      if (typeof response === 'string') {
-        return {
-          userEmail: email,
-          status: response,
-          message: `KYC status: ${response}`,
-          nextSteps: response === 'verified' 
-            ? [] 
-            : ['Complete KYC verification to unlock all features']
-        };
-      } else if (response && typeof response === 'object') {
-        return response;
-      }
+      // Return appropriately formatted response
+      return response;
     } catch (apiError: any) {
       console.log('Error from primary KYC endpoint, trying fallback:', apiError.message);
       // If first endpoint fails, try the fallback endpoint
     }
     
-    // Fallback to alternate KYC endpoint
+    // Fallback to KYCs list endpoint
     const kycInfo = await apiRequest<any>({
       method: 'GET',
       url: '/api/kycs',
@@ -63,9 +52,9 @@ export async function getKycStatus(accessToken: string, email: string) {
       return {
         userEmail: email,
         status: latestKyc.status,
-        level: '1',
+        level: latestKyc.level || '1',
         verificationDate: latestKyc.updatedAt,
-        provider: latestKyc.kycProviderCode,
+        provider: latestKyc.kycProviderCode || latestKyc.providerCode,
         message: `KYC status: ${latestKyc.status}`,
         nextSteps: latestKyc.status === 'verified' 
           ? [] 
@@ -101,19 +90,152 @@ export async function getKycStatus(accessToken: string, email: string) {
 }
 
 /**
+ * Get all KYCs
+ * @param accessToken User's access token
+ * @param page Page number
+ * @param limit Items per page
+ * @returns List of KYC records
+ */
+export async function getAllKycs(accessToken: string, page: number = 1, limit: number = 10) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: '/api/kycs',
+      params: { page, limit },
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get KYCs:', error);
+    throw new Error(`Failed to retrieve KYCs: ${error.message}`);
+  }
+}
+
+/**
+ * Get KYC by ID
+ * @param accessToken User's access token
+ * @param id KYC ID
+ * @returns KYC details
+ */
+export async function getKycById(accessToken: string, id: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: `/api/kycs/${id}`,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error(`Failed to get KYC ${id}:`, error);
+    throw new Error(`Failed to retrieve KYC details: ${error.message}`);
+  }
+}
+
+/**
+ * Create new KYC
+ * @param accessToken User's access token
+ * @param kycData KYC data
+ * @returns Created KYC
+ */
+export async function createKyc(accessToken: string, kycData: any) {
+  try {
+    return await apiRequest<any>({
+      method: 'POST',
+      url: '/api/kycs',
+      data: kycData,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to create KYC:', error);
+    throw new Error(`Failed to create KYC: ${error.message}`);
+  }
+}
+
+/**
+ * Update KYC by ID
+ * @param accessToken User's access token
+ * @param id KYC ID
+ * @param kycData KYC data to update
+ * @returns Updated KYC
+ */
+export async function updateKyc(accessToken: string, id: string, kycData: any) {
+  try {
+    return await apiRequest<any>({
+      method: 'PUT',
+      url: `/api/kycs/${id}`,
+      data: kycData,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error(`Failed to update KYC ${id}:`, error);
+    throw new Error(`Failed to update KYC: ${error.message}`);
+  }
+}
+
+/**
+ * Get KYC public details
+ * @param signature Public signature
+ * @returns Public KYC details
+ */
+export async function getKycPublicDetails(signature: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: `/api/kycs/public/${signature}/detail`
+    });
+  } catch (error: any) {
+    console.error('Failed to get KYC public details:', error);
+    throw new Error(`Failed to retrieve KYC public details: ${error.message}`);
+  }
+}
+
+/**
+ * Get KYC URL
+ * @param signature Public signature
+ * @returns KYC URL
+ */
+export async function getKycUrl(signature: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: `/api/kycs/public/${signature}/kyc-url`
+    });
+  } catch (error: any) {
+    console.error('Failed to get KYC URL:', error);
+    throw new Error(`Failed to retrieve KYC URL: ${error.message}`);
+  }
+}
+
+/**
+ * Get states by country code
+ * @param accessToken User's access token
+ * @param countryCode ISO country code
+ * @returns List of states
+ */
+export async function getStatesByCountry(accessToken: string, countryCode: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: `/api/kycs/states/${countryCode}`,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error(`Failed to get states for country ${countryCode}:`, error);
+    throw new Error(`Failed to retrieve states: ${error.message}`);
+  }
+}
+
+/**
  * Get available payment providers
  * @param accessToken User's access token
  * @returns List of available payment providers
  */
-export async function getPaymentProviders(accessToken: string) {
+export async function getProviders(accessToken: string, page: number = 1, limit: number = 20) {
   try {
-    const response = await apiRequest<{ items: PaymentProvider[] }>({
+    return await apiRequest<any>({
       method: 'GET',
-      url: '/api/kyc/providers',
+      url: '/api/providers',
+      params: { page, limit },
       accessToken
     });
-    
-    return response.items || [];
   } catch (error: any) {
     console.error('Failed to get payment providers:', error);
     throw new Error(`Failed to retrieve payment providers: ${error.message}`);
@@ -121,61 +243,96 @@ export async function getPaymentProviders(accessToken: string) {
 }
 
 /**
- * Get available payment routes
+ * Create payment provider
  * @param accessToken User's access token
- * @returns List of available payment routes
+ * @param providerData Provider data
+ * @returns Created provider
  */
-export async function getPaymentRoutes(accessToken: string) {
+export async function createProvider(accessToken: string, providerData: any) {
   try {
-    const response = await apiRequest<{ items: PaymentRoute[] }>({
-      method: 'GET',
-      url: '/api/kyc/payment-routes',
-      accessToken
-    });
-    
-    return response.items || [];
-  } catch (error: any) {
-    console.error('Failed to get payment routes:', error);
-    throw new Error(`Failed to retrieve payment routes: ${error.message}`);
-  }
-}
-
-/**
- * Submit KYC information (redirects to web platform in practice)
- * @param accessToken User's access token
- * @param kycData KYC submission data
- * @returns Response indicating submission status
- */
-export async function submitKycInfo(accessToken: string, kycData: any) {
-  try {
-    return await apiRequest<{success: boolean, message: string}>({
+    return await apiRequest<any>({
       method: 'POST',
-      url: '/api/kyc/verify',
-      data: kycData,
+      url: '/api/providers',
+      data: providerData,
       accessToken
     });
   } catch (error: any) {
-    console.error('Failed to submit KYC information:', error);
-    throw new Error(`Failed to submit KYC information: ${error.message}`);
+    console.error('Failed to create provider:', error);
+    throw new Error(`Failed to create provider: ${error.message}`);
   }
 }
 
 /**
- * Get KYC verification requirements
+ * Get provider by ID
  * @param accessToken User's access token
- * @returns Verification requirements and steps
+ * @param id Provider ID
+ * @returns Provider details
  */
-export async function getKycRequirements(accessToken: string) {
+export async function getProviderById(accessToken: string, id: string) {
   try {
-    const response = await apiRequest<{ items: KycRequirement[] }>({
+    return await apiRequest<any>({
       method: 'GET',
-      url: '/api/kyc/requirements',
+      url: `/api/providers/${id}`,
       accessToken
     });
-    
-    return response.items || [];
   } catch (error: any) {
-    console.error('Failed to get KYC requirements:', error);
-    throw new Error(`Failed to retrieve KYC requirements: ${error.message}`);
+    console.error(`Failed to get provider ${id}:`, error);
+    throw new Error(`Failed to retrieve provider details: ${error.message}`);
+  }
+}
+
+/**
+ * Get bridge TOS link
+ * @param accessToken User's access token
+ * @returns Bridge TOS link
+ */
+export async function getBridgeTosLink(accessToken: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'POST',
+      url: '/api/providers/bridge-tos-link',
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get bridge TOS link:', error);
+    throw new Error(`Failed to retrieve bridge TOS link: ${error.message}`);
+  }
+}
+
+/**
+ * Submit KYC on partner
+ * @param accessToken User's access token
+ * @param submitData Submission data
+ * @returns Submission result
+ */
+export async function submitKycOnPartner(accessToken: string, submitData: any) {
+  try {
+    return await apiRequest<any>({
+      method: 'POST',
+      url: '/api/providers/submit-kyc-on-partner',
+      data: submitData,
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to submit KYC on partner:', error);
+    throw new Error(`Failed to submit KYC on partner: ${error.message}`);
+  }
+}
+
+/**
+ * Get available routes
+ * @param accessToken User's access token
+ * @returns Available payment routes
+ */
+export async function getAvailableRoutes(accessToken: string) {
+  try {
+    return await apiRequest<any>({
+      method: 'GET',
+      url: '/api/routes',
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to get available routes:', error);
+    throw new Error(`Failed to retrieve available routes: ${error.message}`);
   }
 }

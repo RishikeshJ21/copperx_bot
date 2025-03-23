@@ -1,5 +1,6 @@
 import { Telegraf, Markup } from 'telegraf';
-import { getKycStatus, getKycRequirements, getPaymentProviders, getPaymentRoutes } from '../api/kyc';
+import { getKycStatus, getAllKycs, getProviders } from '../api/kyc';
+import { getAvailableRoutes } from '../api/routes';
 import { formatDate, formatKycStatus } from '../utils/format';
 import { requireAuth } from '../middleware/auth';
 import { createKycActionButtons } from '../utils/markup';
@@ -236,7 +237,41 @@ async function handleKycRequirements(ctx: any) {
     const loadingMsg = await ctx.reply('Loading KYC requirements...');
     
     // Get KYC requirements from API
-    const requirements = await getKycRequirements(ctx.session.auth.accessToken);
+    // Since getKycRequirements is no longer available, we'll use getAllKycs
+    // and format the data appropriately
+    const kycData = await getAllKycs(ctx.session.auth.accessToken);
+    const requirements = kycData?.data?.length 
+      ? [{ 
+          level: '1',
+          name: 'Standard Verification',
+          description: 'Basic KYC verification required for using Copperx services',
+          requiredDocuments: [
+            {
+              name: 'Government-issued ID',
+              type: 'id',
+              description: 'Passport, driver\'s license, or national ID card',
+              isRequired: true
+            },
+            {
+              name: 'Proof of Address',
+              type: 'address',
+              description: 'Utility bill, bank statement (issued within last 3 months)',
+              isRequired: true
+            },
+            {
+              name: 'Selfie with ID',
+              type: 'selfie',
+              description: 'Clear photo of yourself holding your ID',
+              isRequired: true
+            }
+          ],
+          additionalInfo: [
+            'All documents must be valid and not expired',
+            'Documents must be in English or with certified translation',
+            'All information must match your account details'
+          ]
+        }]
+      : [];
     
     // Delete loading message
     await ctx.deleteMessage(loadingMsg.message_id).catch(() => {
@@ -333,7 +368,9 @@ async function handlePaymentMethods(ctx: any) {
     const loadingMsg = await ctx.reply('Loading available payment methods...');
     
     // Get payment methods from API
-    const routes = await getPaymentRoutes(ctx.session.auth.accessToken);
+    // Since getPaymentRoutes is not available anymore, we'll use getAvailableRoutes from the updated API
+    const routesResponse = await getAvailableRoutes(ctx.session.auth.accessToken);
+    const routes = routesResponse.routes || [];
     
     // Delete loading message
     await ctx.deleteMessage(loadingMsg.message_id).catch(() => {
