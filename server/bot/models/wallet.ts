@@ -23,8 +23,9 @@ export interface WalletBalance {
   network: string;
   balance: string;
   isDefault: boolean;
-  address?: string;
+  address?: string | null;
   tokenBalances?: TokenBalance[];
+  id?: string; // For compatibility with some API responses
 }
 
 /**

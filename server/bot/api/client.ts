@@ -54,16 +54,47 @@ export const apiRequest = async <T>(options: {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.error(`API Error (${error.response.status}):`, error.response.data);
-      throw new Error(error.response.data?.message || `API Error ${error.response.status}: ${error.response.statusText}`);
+      console.error(`API Error (${error.response.status}) for ${options.url}:`, error.response.data);
+      
+      // Handle specific status codes
+      if (error.response.status === 401) {
+        throw {
+          message: 'Authentication failed. Please log in again.',
+          response: error.response,
+          status: 401
+        };
+      }
+      
+      if (error.response.status === 404) {
+        throw {
+          message: `Resource not found: ${options.url}`,
+          response: error.response,
+          status: 404
+        };
+      }
+      
+      // Throw error with response included
+      throw {
+        message: error.response.data?.message || `API Error ${error.response.status}: ${error.response.statusText}`,
+        response: error.response,
+        status: error.response.status,
+        data: error.response.data
+      };
     } else if (error.request) {
       // The request was made but no response was received
       console.error('API Request Error:', error.request);
-      throw new Error('No response received from API. Please check your connection.');
+      throw {
+        message: 'No response received from API. Please check your connection.',
+        request: error.request,
+        status: 0
+      };
     } else {
       // Something happened in setting up the request that triggered an Error
       console.error('API Config Error:', error.message);
-      throw new Error(`API request failed: ${error.message}`);
+      throw {
+        message: `API request failed: ${error.message}`,
+        status: 0
+      };
     }
   }
 };

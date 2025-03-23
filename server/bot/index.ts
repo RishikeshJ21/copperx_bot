@@ -1,6 +1,7 @@
 import { Telegraf, Scenes, session } from 'telegraf';
 import { registerCommands } from './commands';
 import { setupMiddleware } from './middleware/session';
+import { suggestKycVerification, requireKycVerification } from './middleware/kyc';
 import { setupPusherNotifications } from './api/notification';
 import { config } from './config';
 import { CopperxContext } from './models';
@@ -38,6 +39,9 @@ export function initializeBot(): Telegraf<CopperxContext> {
   
   // Initialize and set up scenes
   setupScenes(botInstance);
+  
+  // Add KYC verification middleware to check and enforce KYC status for protected features
+  botInstance.use(requireKycVerification);
   
   // Register all commands
   registerCommands(botInstance);

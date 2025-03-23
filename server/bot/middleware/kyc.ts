@@ -60,7 +60,18 @@ export const requireKycVerification: MiddlewareFn<CopperxContext> = async (ctx, 
   
   // Determine what feature is being accessed based on command or action
   const command = ctx.message && 'text' in ctx.message ? ctx.message.text : '';
-  const action = ctx.callbackQuery?.data || '';
+  
+  // Extract action data safely from callback query
+  let action = '';
+  if (ctx.callbackQuery) {
+    // Handle different types of callback queries
+    if ('data' in ctx.callbackQuery && ctx.callbackQuery.data) {
+      action = ctx.callbackQuery.data;
+    } else if ('game_short_name' in ctx.callbackQuery) {
+      action = 'game';
+    }
+  }
+  
   const featureName = command || action || '';
   
   // If this feature doesn't require KYC verification, proceed
