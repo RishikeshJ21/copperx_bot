@@ -1,7 +1,7 @@
 import { Markup, Telegraf } from 'telegraf';
 import { LoginStep, isValidEmail, isValidOTP } from '../utils/validation';
 import { createLoginButtons, createBackButton } from '../utils/markup';
-import { requestEmailOTP, verifyEmailOTP, logout } from '../api/auth';
+import { requestEmailOTP, verifyEmailOTP, logout, checkTokenValidity, getUserProfile } from '../api/auth';
 import { config } from '../config';
 import { CopperxContext } from '../models';
 
@@ -102,14 +102,63 @@ export function registerLoginCommand(bot: Telegraf) {
       return;
     }
     
-    // TODO: Implement token refresh logic here
+    // Show loading message
+    await ctx.editMessageText('🔄 Checking your session...');
     
-    await ctx.editMessageText(
-      '✅ Your session has been refreshed successfully!',
-      Markup.inlineKeyboard([
-        Markup.button.callback('🏠 Main Menu', 'main_menu')
-      ])
-    );
+    try {
+      // Validate the token by checking with the API
+      const isValid = await checkTokenValidity(typedCtx.session.auth.accessToken);
+      
+      if (!isValid) {
+        await ctx.editMessageText(
+          '❌ Your session is no longer valid. Please log in again.',
+          Markup.inlineKeyboard([
+            Markup.button.callback('🔑 Login Again', 'login'),
+            Markup.button.callback('🏠 Main Menu', 'main_menu')
+          ])
+        );
+        return;
+      }
+      
+      // Token is valid, get up-to-date user profile
+      const updatedProfile = await getUserProfile(typedCtx.session.auth.accessToken);
+      
+      // Update the user profile in the session
+      typedCtx.session.auth.user = updatedProfile;
+      await typedCtx.saveSession();
+      
+      // Calculate and display expiry time
+      const expireAt = new Date(typedCtx.session.auth.expireAt);
+      const now = new Date();
+      const hoursRemaining = Math.round((expireAt.getTime() - now.getTime()) / (1000 * 60 * 60));
+      
+      await ctx.editMessageText(
+        `✅ Your session is valid!\n\nYour session will remain active for approximately ${hoursRemaining} hours. User profile has been refreshed.`,
+        Markup.inlineKeyboard([
+          Markup.button.callback('🏠 Main Menu', 'main_menu')
+        ])
+      );
+      
+      // Re-setup real-time notifications
+      if (typedCtx.notifications?.setupForUser && typedCtx.session.auth) {
+        const chatId = ctx.chat!.id.toString();
+        await typedCtx.notifications.setupForUser(
+          chatId,
+          typedCtx.session.auth.accessToken,
+          typedCtx.session.auth.organizationId || ''
+        );
+      }
+    } catch (error) {
+      console.error('Session check failed:', error);
+      
+      await ctx.editMessageText(
+        '❌ Error checking your session. Please try logging in again.',
+        Markup.inlineKeyboard([
+          Markup.button.callback('🔑 Login Again', 'login'),
+          Markup.button.callback('🏠 Main Menu', 'main_menu')
+        ])
+      );
+    }
   });
   
   // Handler for logout

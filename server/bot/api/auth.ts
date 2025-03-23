@@ -44,6 +44,37 @@ export async function verifyEmailOTP(
 }
 
 /**
+ * Check token validity and user profile
+ * This function doesn't refresh tokens but validates them
+ * @param accessToken User's access token
+ * @returns True if token is valid, false otherwise
+ */
+export async function checkTokenValidity(accessToken: string): Promise<boolean> {
+  try {
+    await getUserProfile(accessToken);
+    return true;
+  } catch (error: any) {
+    console.error('Token validation failed:', error);
+    return false;
+  }
+}
+
+/**
+ * Request a new authentication flow without requiring user input
+ * Note: This is a workaround since there's no explicit refresh token endpoint
+ * @param email User's email address 
+ * @returns OTP request response for starting a new authentication flow
+ */
+export async function requestNewAuthFlow(email: string): Promise<EmailOtpRequestResponse> {
+  try {
+    return await requestEmailOTP(email);
+  } catch (error: any) {
+    console.error('Failed to start new auth flow:', error);
+    throw new Error(`Failed to refresh session: ${error.message}`);
+  }
+}
+
+/**
  * Get current user profile
  * @param accessToken User's access token
  * @returns User profile data

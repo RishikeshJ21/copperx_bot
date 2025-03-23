@@ -12,6 +12,7 @@ export const SCENE_IDS = {
   SETTINGS: 'settings_scene',
   PROFILE: 'profile_scene',
   HELP: 'help_scene',
+  ACCOUNT_MANAGEMENT: 'account_management_scene',
 };
 
 export const SCENE_FEATURES = {
@@ -21,6 +22,7 @@ export const SCENE_FEATURES = {
     WITHDRAW: true,
     BALANCE: true,
     KYC: true,
+    ACCOUNT_MANAGEMENT: true,
     SETTINGS: false, // Not implemented yet
     PROFILE: false,  // Not implemented yet
     HELP: false,     // Not implemented yet

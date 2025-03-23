@@ -1,0 +1,1767 @@
+Transfer
+
+
+GET
+/api/transfers
+List of transfers
+
+
+Parameters
+Try it out
+Name	Description
+page
+number
+(query)
+Page number. Starts from 1
+
+page
+limit
+number
+(query)
+Number of items per page
+
+limit
+sourceCountry
+string
+(query)
+Available values : usa, ind, are, idn, pak, sgp, esp, can, cym, lbn, mys, pan, tur, vct, vgb, vnm, bel, tha, hkg, aut, hrv, cyp, est, fin, fra, gre, irl, ita, lva, ltu, lux, mlt, nld, prt, svk, svn, deu, bgd, phl, khm, aus, gbr, npl, lka, ben, cmr, gha, ken, moz, sen, tza, uga, nzl, kor, mmr, jpn, bra, chn, none
+
+
+--
+destinationCountry
+string
+(query)
+Available values : usa, ind, are, idn, pak, sgp, esp, can, cym, lbn, mys, pan, tur, vct, vgb, vnm, bel, tha, hkg, aut, hrv, cyp, est, fin, fra, gre, irl, ita, lva, ltu, lux, mlt, nld, prt, svk, svn, deu, bgd, phl, khm, aus, gbr, npl, lka, ben, cmr, gha, ken, moz, sen, tza, uga, nzl, kor, mmr, jpn, bra, chn, none
+
+
+--
+status
+string
+(query)
+Available values : pending, initiated, processing, success, canceled, failed, refunded
+
+
+--
+sync
+boolean
+(query)
+
+--
+type
+array[string]
+(query)
+Available values : send, receive, withdraw, deposit, bridge, bank_deposit
+
+--sendreceivewithdrawdepositbridgebank_deposit
+startDate
+(query)
+startDate
+endDate
+(query)
+endDate
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "page": 1,
+  "limit": 10,
+  "count": 1,
+  "hasMore": true,
+  "data": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T20:53:59.112Z",
+      "updatedAt": "2025-03-23T20:53:59.112Z",
+      "organizationId": "string",
+      "status": "pending",
+      "customerId": "string",
+      "customer": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.112Z",
+        "updatedAt": "2025-03-23T20:53:59.112Z",
+        "name": "string",
+        "businessName": "string",
+        "email": "string",
+        "country": "string"
+      },
+      "type": "send",
+      "sourceCountry": "usa",
+      "destinationCountry": "usa",
+      "destinationCurrency": "USD",
+      "amount": "9223372036854775807",
+      "currency": "USD",
+      "amountSubtotal": "9223372036854775807",
+      "totalFee": "9223372036854775807",
+      "feePercentage": "string",
+      "feeCurrency": "USD",
+      "invoiceNumber": "string",
+      "invoiceUrl": "string",
+      "sourceOfFundsFile": "string",
+      "note": "string",
+      "purposeCode": "self",
+      "sourceOfFunds": "salary",
+      "recipientRelationship": "self",
+      "sourceAccountId": "string",
+      "destinationAccountId": "string",
+      "paymentUrl": "string",
+      "mode": "on_ramp",
+      "isThirdPartyPayment": true,
+      "transactions": [
+        {
+          "id": "string",
+          "createdAt": "2025-03-23T20:53:59.112Z",
+          "updatedAt": "2025-03-23T20:53:59.112Z",
+          "organizationId": "string",
+          "type": "send",
+          "providerCode": "0x0",
+          "kycId": "string",
+          "transferId": "string",
+          "status": "pending",
+          "externalStatus": "string",
+          "fromAccountId": "string",
+          "toAccountId": "string",
+          "fromAmount": "9223372036854775807",
+          "fromCurrency": "USD",
+          "toAmount": "9223372036854775807",
+          "toCurrency": "USD",
+          "totalFee": "9223372036854775807",
+          "feeCurrency": "USD",
+          "transactionHash": "string",
+          "depositAccount": {
+            "id": "string",
+            "createdAt": "2025-03-23T20:53:59.112Z",
+            "updatedAt": "2025-03-23T20:53:59.112Z",
+            "type": "web3_wallet",
+            "country": "usa",
+            "network": "string",
+            "accountId": "string",
+            "walletAddress": "string",
+            "bankName": "string",
+            "bankAddress": "string",
+            "bankRoutingNumber": "string",
+            "bankAccountNumber": "string",
+            "bankDepositMessage": "string",
+            "wireMessage": "string",
+            "payeeEmail": "string",
+            "payeeOrganizationId": "string",
+            "payeeId": "string",
+            "payeeDisplayName": "string"
+          },
+          "externalTransactionId": "string",
+          "externalCustomerId": "string",
+          "depositUrl": "string"
+        }
+      ],
+      "destinationAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.112Z",
+        "updatedAt": "2025-03-23T20:53:59.112Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "sourceAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.112Z",
+        "updatedAt": "2025-03-23T20:53:59.112Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "senderDisplayName": "string"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/offramp
+Create offramp transfer
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "quotePayload": "string",
+  "quoteSignature": "string",
+  "preferredWalletId": "string",
+  "customerData": {
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "sourceOfFundsFile": "string",
+  "note": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.135Z",
+  "updatedAt": "2025-03-23T20:53:59.135Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.135Z",
+    "updatedAt": "2025-03-23T20:53:59.135Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.135Z",
+    "updatedAt": "2025-03-23T20:53:59.135Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.135Z",
+    "updatedAt": "2025-03-23T20:53:59.135Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/onramp
+Create onramp transfer
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "quotePayload": "string",
+  "quoteSignature": "string",
+  "preferredWalletId": "string",
+  "customerData": {
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  }
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.152Z",
+  "updatedAt": "2025-03-23T20:53:59.152Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.152Z",
+    "updatedAt": "2025-03-23T20:53:59.152Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.152Z",
+    "updatedAt": "2025-03-23T20:53:59.152Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.152Z",
+    "updatedAt": "2025-03-23T20:53:59.152Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/wallet-withdraw
+Withdraw balance to wallet
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "walletAddress": "string",
+  "amount": "9223372036854775807",
+  "purposeCode": "self",
+  "currency": "USD"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.163Z",
+  "updatedAt": "2025-03-23T20:53:59.163Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.163Z",
+    "updatedAt": "2025-03-23T20:53:59.163Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.163Z",
+    "updatedAt": "2025-03-23T20:53:59.163Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.163Z",
+    "updatedAt": "2025-03-23T20:53:59.163Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/send
+Send payment to user using email or wallet address
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "walletAddress": "string",
+  "email": "string",
+  "payeeId": "string",
+  "amount": "9223372036854775807",
+  "purposeCode": "self",
+  "currency": "USD"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.178Z",
+  "updatedAt": "2025-03-23T20:53:59.178Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.178Z",
+    "updatedAt": "2025-03-23T20:53:59.178Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.178Z",
+    "updatedAt": "2025-03-23T20:53:59.178Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.178Z",
+    "updatedAt": "2025-03-23T20:53:59.178Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/send-batch
+Send payment to multiple users in batch
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "requests": [
+    {
+      "requestId": "string",
+      "request": {
+        "walletAddress": "string",
+        "email": "string",
+        "payeeId": "string",
+        "amount": "9223372036854775807",
+        "purposeCode": "self",
+        "currency": "USD"
+      }
+    }
+  ]
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "responses": [
+    {
+      "requestId": "string",
+      "request": {
+        "walletAddress": "string",
+        "email": "string",
+        "payeeId": "string",
+        "amount": "9223372036854775807",
+        "purposeCode": "self",
+        "currency": "USD"
+      },
+      "response": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.193Z",
+        "updatedAt": "2025-03-23T20:53:59.193Z",
+        "organizationId": "string",
+        "status": "pending",
+        "customerId": "string",
+        "customer": {
+          "id": "string",
+          "createdAt": "2025-03-23T20:53:59.193Z",
+          "updatedAt": "2025-03-23T20:53:59.193Z",
+          "name": "string",
+          "businessName": "string",
+          "email": "string",
+          "country": "string"
+        },
+        "type": "send",
+        "sourceCountry": "usa",
+        "destinationCountry": "usa",
+        "destinationCurrency": "USD",
+        "amount": "9223372036854775807",
+        "currency": "USD",
+        "amountSubtotal": "9223372036854775807",
+        "totalFee": "9223372036854775807",
+        "feePercentage": "string",
+        "feeCurrency": "USD",
+        "invoiceNumber": "string",
+        "invoiceUrl": "string",
+        "sourceOfFundsFile": "string",
+        "note": "string",
+        "purposeCode": "self",
+        "sourceOfFunds": "salary",
+        "recipientRelationship": "self",
+        "sourceAccountId": "string",
+        "destinationAccountId": "string",
+        "paymentUrl": "string",
+        "mode": "on_ramp",
+        "isThirdPartyPayment": true
+      },
+      "error": {
+        "message": {},
+        "statusCode": 0,
+        "error": "string"
+      }
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/deposit
+Deposit payment to wallet using copperx gateway
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "amount": "9223372036854775807",
+  "sourceOfFunds": "salary",
+  "depositChainId": 1
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.208Z",
+  "updatedAt": "2025-03-23T20:53:59.208Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.208Z",
+    "updatedAt": "2025-03-23T20:53:59.208Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "transactions": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T20:53:59.208Z",
+      "updatedAt": "2025-03-23T20:53:59.208Z",
+      "organizationId": "string",
+      "type": "send",
+      "providerCode": "0x0",
+      "kycId": "string",
+      "transferId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "fromAccountId": "string",
+      "toAccountId": "string",
+      "fromAmount": "9223372036854775807",
+      "fromCurrency": "USD",
+      "toAmount": "9223372036854775807",
+      "toCurrency": "USD",
+      "totalFee": "9223372036854775807",
+      "feeCurrency": "USD",
+      "transactionHash": "string",
+      "depositAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.208Z",
+        "updatedAt": "2025-03-23T20:53:59.208Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "externalTransactionId": "string",
+      "externalCustomerId": "string",
+      "depositUrl": "string"
+    }
+  ],
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.208Z",
+    "updatedAt": "2025-03-23T20:53:59.208Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.208Z",
+    "updatedAt": "2025-03-23T20:53:59.208Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfers/bridge
+Bridge payment to wallet using copperx gateway
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "sourceNetwork": "137",
+  "amount": "9223372036854775807",
+  "sourceOfFunds": "salary"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.226Z",
+  "updatedAt": "2025-03-23T20:53:59.226Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.226Z",
+    "updatedAt": "2025-03-23T20:53:59.226Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "transactions": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T20:53:59.226Z",
+      "updatedAt": "2025-03-23T20:53:59.226Z",
+      "organizationId": "string",
+      "type": "send",
+      "providerCode": "0x0",
+      "kycId": "string",
+      "transferId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "fromAccountId": "string",
+      "toAccountId": "string",
+      "fromAmount": "9223372036854775807",
+      "fromCurrency": "USD",
+      "toAmount": "9223372036854775807",
+      "toCurrency": "USD",
+      "totalFee": "9223372036854775807",
+      "feeCurrency": "USD",
+      "transactionHash": "string",
+      "depositAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.226Z",
+        "updatedAt": "2025-03-23T20:53:59.226Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "externalTransactionId": "string",
+      "externalCustomerId": "string",
+      "depositUrl": "string"
+    }
+  ],
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.226Z",
+    "updatedAt": "2025-03-23T20:53:59.226Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.226Z",
+    "updatedAt": "2025-03-23T20:53:59.226Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/transfers/balances
+Get user balance on different networks
+
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "balances": [
+    {
+      "chainId": "137",
+      "balance": "9223372036854775807"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/transfers/{id}
+Get transfer
+
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.253Z",
+  "updatedAt": "2025-03-23T20:53:59.253Z",
+  "organizationId": "string",
+  "status": "pending",
+  "customerId": "string",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.253Z",
+    "updatedAt": "2025-03-23T20:53:59.253Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "destinationCurrency": "USD",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "amountSubtotal": "9223372036854775807",
+  "totalFee": "9223372036854775807",
+  "feePercentage": "string",
+  "feeCurrency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "sourceOfFundsFile": "string",
+  "note": "string",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "sourceAccountId": "string",
+  "destinationAccountId": "string",
+  "paymentUrl": "string",
+  "mode": "on_ramp",
+  "isThirdPartyPayment": true,
+  "sourceAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.253Z",
+    "updatedAt": "2025-03-23T20:53:59.253Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "destinationAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.253Z",
+    "updatedAt": "2025-03-23T20:53:59.253Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "senderDisplayName": "string",
+  "transactions": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T20:53:59.253Z",
+      "updatedAt": "2025-03-23T20:53:59.253Z",
+      "organizationId": "string",
+      "type": "send",
+      "providerCode": "0x0",
+      "kycId": "string",
+      "transferId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "fromAccountId": "string",
+      "toAccountId": "string",
+      "fromAmount": "9223372036854775807",
+      "fromCurrency": "USD",
+      "toAmount": "9223372036854775807",
+      "toCurrency": "USD",
+      "totalFee": "9223372036854775807",
+      "feeCurrency": "USD",
+      "transactionHash": "string",
+      "depositAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.253Z",
+        "updatedAt": "2025-03-23T20:53:59.253Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "externalTransactionId": "string",
+      "externalCustomerId": "string",
+      "depositUrl": "string"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Transaction
+
+
+GET
+/api/transactions
+List of transactions
+
+
+Parameters
+Try it out
+Name	Description
+page
+number
+(query)
+Page number. Starts from 1
+
+page
+limit
+number
+(query)
+Number of items per page
+
+limit
+transferId
+string
+(query)
+Transfer id
+
+transferId
+kycId
+string
+(query)
+KYC id
+
+kycId
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "page": 1,
+  "limit": 10,
+  "count": 1,
+  "hasMore": true,
+  "data": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T20:53:59.277Z",
+      "updatedAt": "2025-03-23T20:53:59.277Z",
+      "organizationId": "string",
+      "type": "send",
+      "providerCode": "0x0",
+      "kycId": "string",
+      "transferId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "fromAccountId": "string",
+      "toAccountId": "string",
+      "fromAmount": "9223372036854775807",
+      "fromCurrency": "USD",
+      "toAmount": "9223372036854775807",
+      "toCurrency": "USD",
+      "totalFee": "9223372036854775807",
+      "feeCurrency": "USD",
+      "transactionHash": "string",
+      "depositAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.277Z",
+        "updatedAt": "2025-03-23T20:53:59.277Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "externalTransactionId": "string",
+      "externalCustomerId": "string",
+      "depositUrl": "string",
+      "fromAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.277Z",
+        "updatedAt": "2025-03-23T20:53:59.277Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      },
+      "toAccount": {
+        "id": "string",
+        "createdAt": "2025-03-23T20:53:59.277Z",
+        "updatedAt": "2025-03-23T20:53:59.277Z",
+        "type": "web3_wallet",
+        "country": "usa",
+        "network": "string",
+        "accountId": "string",
+        "walletAddress": "string",
+        "bankName": "string",
+        "bankAddress": "string",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankDepositMessage": "string",
+        "wireMessage": "string",
+        "payeeEmail": "string",
+        "payeeOrganizationId": "string",
+        "payeeId": "string",
+        "payeeDisplayName": "string"
+      }
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/transactions/{id}
+Get transaction
+
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T20:53:59.292Z",
+  "updatedAt": "2025-03-23T20:53:59.292Z",
+  "organizationId": "string",
+  "type": "send",
+  "providerCode": "0x0",
+  "kycId": "string",
+  "transferId": "string",
+  "status": "pending",
+  "externalStatus": "string",
+  "fromAccountId": "string",
+  "toAccountId": "string",
+  "fromAmount": "9223372036854775807",
+  "fromCurrency": "USD",
+  "toAmount": "9223372036854775807",
+  "toCurrency": "USD",
+  "totalFee": "9223372036854775807",
+  "feeCurrency": "USD",
+  "transactionHash": "string",
+  "depositAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.292Z",
+    "updatedAt": "2025-03-23T20:53:59.292Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "externalTransactionId": "string",
+  "externalCustomerId": "string",
+  "depositUrl": "string",
+  "fromAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.292Z",
+    "updatedAt": "2025-03-23T20:53:59.292Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  },
+  "toAccount": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.292Z",
+    "updatedAt": "2025-03-23T20:53:59.292Z",
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "accountId": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "payeeEmail": "string",
+    "payeeOrganizationId": "string",
+    "payeeId": "string",
+    "payeeDisplayName": "string"
+  }
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transactions/{id}/confirm-bank-transfer
+User manually just confirm that he/she deposited money to the bank account. This does not guarantee that the money is actually deposited to the bank account.
+
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "string",
+  "statusCode": 0
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+PublicPage
+
+
+GET
+/api/public-pages/for-transfer/{id}/{hash}
+Get transfer
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+hash *
+string
+(path)
+hash
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "status": "pending",
+  "customer": {
+    "id": "string",
+    "createdAt": "2025-03-23T20:53:59.313Z",
+    "updatedAt": "2025-03-23T20:53:59.313Z",
+    "name": "string",
+    "businessName": "string",
+    "email": "string",
+    "country": "string"
+  },
+  "type": "send",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "invoiceNumber": "string",
+  "invoiceUrl": "string",
+  "purposeCode": "self",
+  "depositAccount": {
+    "type": "web3_wallet",
+    "country": "usa",
+    "network": "string",
+    "walletAddress": "string",
+    "bankName": "string",
+    "bankAddress": "string",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankDepositMessage": "string",
+    "wireMessage": "string",
+    "amount": "string",
+    "currency": "string"
+  },
+  "receiverCustomer": {
+    "type": "individual",
+    "firstName": "string",
+    "lastName": "string",
+    "businessName": "string",
+    "email": "string",
+    "receiverName": "string"
+  }
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}

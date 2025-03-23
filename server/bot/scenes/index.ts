@@ -2,6 +2,7 @@ import { Scenes, Telegraf } from 'telegraf';
 import { CopperxContext } from '../models';
 import { SCENE_IDS } from './config';
 import { createBalanceScene } from './balance-scene';
+import { registerAccountScene } from './account-scene';
 
 /**
  * Initialize and register all scenes (wizards) for the bot
@@ -17,6 +18,9 @@ export function setupScenes(bot: Telegraf<CopperxContext>): Scenes.Stage<Copperx
   // Create the balance scene (more complex functionality)
   const balanceScene = createBalanceScene();
   
+  // Register account management scenes (wizard-based)
+  const accountScenes = registerAccountScene();
+  
   // Configure basic scenes
   setupBasicScenes(sendScene, depositScene, withdrawScene);
   
@@ -26,7 +30,8 @@ export function setupScenes(bot: Telegraf<CopperxContext>): Scenes.Stage<Copperx
     sendScene,
     depositScene,
     withdrawScene,
-    balanceScene
+    balanceScene,
+    ...accountScenes
   ]);
   
   // Use scene middleware
@@ -157,5 +162,13 @@ function registerSceneEntryPoints(bot: Telegraf<CopperxContext>) {
   bot.action('wallets', async (ctx) => {
     await ctx.answerCbQuery('Viewing your wallets...');
     return ctx.scene.enter(SCENE_IDS.BALANCE);
+  });
+  
+  // Account management entry points
+  bot.command('accounts', (ctx) => ctx.scene.enter(SCENE_IDS.ACCOUNT_MANAGEMENT));
+  bot.command('account', (ctx) => ctx.scene.enter(SCENE_IDS.ACCOUNT_MANAGEMENT));
+  bot.action('accounts', async (ctx) => {
+    await ctx.answerCbQuery('Managing your accounts...');
+    return ctx.scene.enter(SCENE_IDS.ACCOUNT_MANAGEMENT);
   });
 }

@@ -2,7 +2,7 @@ import { Context, Middleware } from 'telegraf';
 import { createLoginButtons } from '../utils/markup';
 import { config } from '../config';
 import { CopperxContext } from '../models';
-import { getUserProfile } from '../api/auth';
+import { getUserProfile, checkTokenValidity } from '../api/auth';
 import { getKycStatus } from '../api/kyc';
 import { KycStatusType } from '../models/kyc';
 
@@ -23,31 +23,27 @@ export const requireAuth: Middleware<CopperxContext> = async (ctx, next) => {
   if (ctx.session.auth.expireAt) {
     const expireAt = new Date(ctx.session.auth.expireAt);
     const now = new Date();
-    const bufferTime = config.auth.tokenExpiryBuffer * 1000; // Convert seconds to milliseconds
     
-    if (expireAt.getTime() - now.getTime() < bufferTime) {
-      // Token is expired or about to expire
+    // Token is fully expired, force re-login
+    if (expireAt <= now) {
+      console.log('Token expired, forcing re-login');
+      ctx.session.auth = undefined;
+      await ctx.saveSession();
+      
       await ctx.reply(
         '🔒 Your session has expired. Please log in again.',
         createLoginButtons()
       );
-      
-      // Clear the expired session
-      ctx.session.auth = undefined;
-      await ctx.saveSession();
       return;
     }
   }
   
-  // Validate token by making a quick profile call
-  try {
-    if (ctx.update.message?.text && !ctx.update.message.text.startsWith('/kyc')) {
-      await getUserProfile(ctx.session.auth.accessToken);
-    }
-  } catch (error) {
-    console.error('Token validation failed:', error);
-    
-    // Clear invalid session
+  // Validate token by checking with API
+  const isValid = await checkTokenValidity(ctx.session.auth.accessToken);
+  
+  if (!isValid) {
+    // Token is invalid or expired according to the API
+    console.log('Token validation failed, clearing session');
     ctx.session.auth = undefined;
     await ctx.saveSession();
     
@@ -58,20 +54,25 @@ export const requireAuth: Middleware<CopperxContext> = async (ctx, next) => {
     return;
   }
   
-  // Only check KYC status for financial operations
-  if (ctx.update.message && ['/send', '/withdraw', '/deposit', '/wallets', '/balance'].some(cmd => 
-      ctx.update.message?.text?.startsWith(cmd))) {
+  // Only check KYC status for the /send command - per user request
+  if (ctx.update?.message?.text?.startsWith('/send')) {
     try {
-      // Check KYC status first
+      // Make sure we have user email
+      if (!ctx.session.auth.user?.email) {
+        throw new Error('Missing user email for KYC check');
+      }
+      
+      // Check KYC status
       const kycStatus = await getKycStatus(ctx.session.auth.accessToken, ctx.session.auth.user.email);
       
       // Store KYC status in session
       ctx.session.kycStatus = kycStatus;
       await ctx.saveSession();
       
-      // If KYC is not verified, restrict access to these commands
+      // If KYC is not verified, restrict access to send money
       if (kycStatus.status !== KycStatusType.VERIFIED) {
-        const statusMessages = {
+        // Define status-specific messages
+        const statusMessages: Record<string, string> = {
           [KycStatusType.NOT_STARTED]: '❗ You need to complete KYC verification before using this feature. Use /kyc to start the verification process.',
           [KycStatusType.PENDING]: '⏳ Your KYC verification is still being processed. You\'ll get access to this feature once your verification is approved.',
           [KycStatusType.REJECTED]: '❌ Your KYC verification was rejected. Use /kyc to view the reason and resubmit your verification.',
