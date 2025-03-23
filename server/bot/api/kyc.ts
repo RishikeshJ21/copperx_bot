@@ -17,7 +17,8 @@ export async function getKycStatus(accessToken: string, email: string) {
   try {
     return await apiRequest<KycStatusResponse>({
       method: 'GET',
-      url: `/api/kycs/status/${encodeURIComponent(email)}`,
+      url: `/api/kyc/status`,
+      params: { email },
       accessToken
     });
   } catch (error: any) {
@@ -35,7 +36,7 @@ export async function getPaymentProviders(accessToken: string) {
   try {
     const response = await apiRequest<{ items: PaymentProvider[] }>({
       method: 'GET',
-      url: '/api/kycs/providers',
+      url: '/api/kyc/providers',
       accessToken
     });
     
@@ -55,7 +56,7 @@ export async function getPaymentRoutes(accessToken: string) {
   try {
     const response = await apiRequest<{ items: PaymentRoute[] }>({
       method: 'GET',
-      url: '/api/kycs/routes',
+      url: '/api/kyc/payment-routes',
       accessToken
     });
     
@@ -76,7 +77,7 @@ export async function submitKycInfo(accessToken: string, kycData: any) {
   try {
     return await apiRequest<{success: boolean, message: string}>({
       method: 'POST',
-      url: '/api/kycs/submit',
+      url: '/api/kyc/verify',
       data: kycData,
       accessToken
     });
@@ -95,7 +96,7 @@ export async function getKycRequirements(accessToken: string) {
   try {
     const response = await apiRequest<{ items: KycRequirement[] }>({
       method: 'GET',
-      url: '/api/kycs/requirements',
+      url: '/api/kyc/requirements',
       accessToken
     });
     

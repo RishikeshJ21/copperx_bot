@@ -22,7 +22,7 @@ export async function sendFunds(
   try {
     return await apiRequest<TransferResponse>({
       method: 'POST',
-      url: '/api/transfers/send',
+      url: '/api/transfers/email',
       data,
       accessToken
     });
@@ -45,7 +45,7 @@ export async function withdrawToWallet(
   try {
     return await apiRequest<TransferResponse>({
       method: 'POST',
-      url: '/api/transfers/withdraw',
+      url: '/api/transfers/crypto',
       data,
       accessToken
     });
@@ -68,7 +68,7 @@ export async function withdrawToBank(
   try {
     return await apiRequest<TransferResponse>({
       method: 'POST',
-      url: '/api/transfers/offramp',
+      url: '/api/transfers/bank',
       data,
       accessToken
     });

@@ -5,6 +5,7 @@
 export const config = {
   api: {
     baseURL: 'https://income-api.copperx.io',
+    baseUrl: 'https://income-api.copperx.io', // Legacy reference, keeping both for compatibility
     timeout: 15000, // 15 seconds timeout for API requests
   },
   bot: {
@@ -22,6 +23,12 @@ export const config = {
     maxTransactionAmount: 10000, // Maximum amount for a single transaction
     minWithdrawalAmount: 1, // Minimum amount for withdrawal
     maxWithdrawalAmount: 1000, // Maximum amount for withdrawal
+  },
+  pusher: {
+    key: 'dabe49bce76f0280d338',
+    cluster: 'ap2',
+    authEndpoint: '/api/pusher/auth',
+    app_id: '1956356',
   },
   notifications: {
     enabled: true,
