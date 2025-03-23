@@ -1,8 +1,55 @@
 import axios from 'axios';
 import { Telegraf } from 'telegraf';
 import Pusher from 'pusher-js';
+import crypto from 'crypto';
 import { config } from '../config';
 import { formatCurrency } from '../utils/format';
+
+/**
+ * Generate Pusher authentication signature for private channels
+ * @param socketId Pusher socket ID
+ * @param channelName Pusher channel name
+ * @returns Authentication signature
+ */
+function generatePusherAuth(socketId: string, channelName: string) {
+  const { key, secret } = config.pusher;
+  
+  // For presence channels, include channel_data
+  let channelData = null;
+  if (channelName.startsWith('presence-')) {
+    channelData = JSON.stringify({
+      user_id: channelName.split('-').pop(), // Use org ID as user_id
+      user_info: {}
+    });
+  }
+  
+  // For private channels, just create signature
+  // String to sign is different depending on channel type
+  const stringToSign = channelData 
+    ? `${socketId}:${channelName}:${channelData}`
+    : `${socketId}:${channelName}`;
+  
+  // Create HMAC SHA256 signature
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(stringToSign)
+    .digest('hex');
+  
+  // Authentication string format: app_key:signature
+  const authSignature = `${key}:${signature}`;
+  
+  // Return the appropriate format based on channel type
+  if (channelData) {
+    return {
+      auth: authSignature,
+      channel_data: channelData
+    };
+  }
+  
+  return {
+    auth: authSignature
+  };
+}
 
 /**
  * Set up Pusher client for real-time notifications
@@ -16,26 +63,11 @@ function createPusherClient(accessToken: string, organizationId: string) {
     authorizer: (channel) => ({
       authorize: async (socketId, callback) => {
         try {
-          // Authenticate with Copperx Pusher service
-          const response = await axios.post(
-            `${config.api.baseUrl}/api/${config.api.version}/pusher/auth`,
-            {
-              socket_id: socketId,
-              channel_name: channel.name
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-
-          if (response.data) {
-            callback(null, response.data);
-          } else {
-            callback(new Error('Pusher authentication failed'), null);
-          }
+          // Use our server-side authentication
+          const authData = generatePusherAuth(socketId, channel.name);
+          
+          console.log(`Authorizing channel ${channel.name} for socket ${socketId}`);
+          callback(null, authData);
         } catch (error) {
           console.error('Pusher authorization error:', error);
           callback(error as Error, null);

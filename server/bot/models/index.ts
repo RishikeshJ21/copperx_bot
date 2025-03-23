@@ -46,6 +46,9 @@ export interface BaseSessionState {
     history?: Date;
     points?: Date;
   };
+  
+  // Session management & validation
+  lastTokenValidationTime?: number;
 }
 
 /**

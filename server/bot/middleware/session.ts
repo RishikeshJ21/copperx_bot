@@ -39,10 +39,26 @@ export function setupMiddleware(): MiddlewareFn<Context> {
       
       // Initialize session if not exists
       if (session) {
+        // Restore session state with default fallbacks 
         typedCtx.session = {
           ...DEFAULT_SESSION_STATE,
           ...((session.state as any) || {})
         };
+        
+        // Restore authentication information from explicit fields (more reliable)
+        if (session.accessToken) {
+          // If we don't have auth data in session state or it's incomplete,
+          // but we do have it in the dedicated fields, restore from there
+          if (!typedCtx.session.auth || !typedCtx.session.auth.accessToken) {
+            console.log(`Restoring auth data for user ${telegramId} from storage fields`);
+            typedCtx.session.auth = {
+              accessToken: session.accessToken,
+              expireAt: session.expireAt || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default 7 day expiry
+              organizationId: session.organizationId || undefined,
+              user: typedCtx.session.user || undefined
+            };
+          }
+        }
       } else {
         typedCtx.session = { ...DEFAULT_SESSION_STATE };
         
@@ -79,16 +95,27 @@ export function setupMiddleware(): MiddlewareFn<Context> {
         const existingSession = await storage.getSession(telegramId);
         
         if (existingSession) {
+          // Always update both the state object and dedicated auth fields
+          // This provides redundancy and ensures auth isn't lost during serialization
           await storage.updateSession(telegramId, {
-            state: typedCtx.session as any
+            state: typedCtx.session as any,
+            accessToken: typedCtx.session.auth?.accessToken || null,
+            expireAt: typedCtx.session.auth?.expireAt ? new Date(typedCtx.session.auth.expireAt) : null,
+            organizationId: typedCtx.session.auth?.organizationId || null,
+            sid: typedCtx.session.login?.sid || null
           });
+          
+          // Debug log for session persistence
+          if (typedCtx.session.auth?.accessToken) {
+            console.log(`Session updated for user ${telegramId} with valid auth token`);
+          }
         } else {
           await storage.createSession({
             telegramId,
             state: typedCtx.session as any,
             accessToken: typedCtx.session.auth?.accessToken || null,
             expireAt: typedCtx.session.auth?.expireAt ? new Date(typedCtx.session.auth.expireAt) : null,
-            sid: null,
+            sid: typedCtx.session.login?.sid || null,
             organizationId: typedCtx.session.auth?.organizationId || null
           });
         }

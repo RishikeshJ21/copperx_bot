@@ -36,22 +36,52 @@ export const requireAuth: Middleware<CopperxContext> = async (ctx, next) => {
       );
       return;
     }
+    
+    // If token is close to expiring but not yet expired, we'll still let this request through
+    // But we'll log it for visibility - in a real-world scenario, we might implement token refresh
+    if (expireAt.getTime() - now.getTime() < config.auth.tokenExpiryBuffer * 1000) {
+      console.log(`Token for user ${ctx.from?.id} is nearing expiration`);
+    }
   }
   
-  // Validate token by checking with API
-  const isValid = await checkTokenValidity(ctx.session.auth.accessToken);
+  // We'll limit API validation checks to save on API calls
+  // Only validate when:
+  // 1. No recent validation 
+  // 2. Randomly with 10% chance for general validation
+  // 3. For financial operations like send, withdraw
   
-  if (!isValid) {
-    // Token is invalid or expired according to the API
-    console.log('Token validation failed, clearing session');
-    ctx.session.auth = undefined;
-    await ctx.saveSession();
+  const commandRequiresValidation = 
+    ctx.update?.message?.text?.startsWith('/send') || 
+    ctx.update?.message?.text?.startsWith('/withdraw') ||
+    ctx.update?.message?.text?.startsWith('/deposit');
+  
+  const randomCheck = Math.random() < 0.1; // 10% chance of checking
+  const lastCheck = ctx.session.lastTokenValidationTime || 0;
+  const timeNow = Date.now();
+  const timeSinceLastCheck = timeNow - lastCheck;
+  const needsCheck = timeSinceLastCheck > 10 * 60 * 1000; // Check at least every 10 minutes
+  
+  if (commandRequiresValidation || randomCheck || needsCheck) {
+    // Validate token by checking with API
+    console.log(`Validating token for user ${ctx.from?.id}`);
+    const isValid = await checkTokenValidity(ctx.session.auth.accessToken);
     
-    await ctx.reply(
-      '🔒 Your session is invalid. Please log in again.',
-      createLoginButtons()
-    );
-    return;
+    if (!isValid) {
+      // Token is invalid or expired according to the API
+      console.log('Token validation failed, clearing session');
+      ctx.session.auth = undefined;
+      await ctx.saveSession();
+      
+      await ctx.reply(
+        '🔒 Your session is invalid. Please log in again.',
+        createLoginButtons()
+      );
+      return;
+    }
+    
+    // Update the last validation time
+    ctx.session.lastTokenValidationTime = timeNow;
+    await ctx.saveSession();
   }
   
   // Only check KYC status for the /send command - per user request
