@@ -1,0 +1,1812 @@
+Route
+
+
+GET
+/api/routes
+List of available routes
+
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "routes": [
+    {
+      "sourceCountry": "usa",
+      "sourceCurrency": "USD",
+      "sourceMethod": "web3_wallet",
+      "destinationCountry": "usa",
+      "destinationCurrency": "USD",
+      "destinationMethod": "web3_wallet",
+      "mode": "on_ramp",
+      "providerCode": "0x0",
+      "status": "active",
+      "kycId": "string",
+      "kycStatus": "string",
+      "info": "string"
+    }
+  ],
+  "approvedProviders": [
+    "0x0"
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Deposit Account
+
+
+GET
+/api/deposit-accounts
+List of deposit accounts
+
+
+Returns the list of deposit accounts
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "data": [
+    {
+      "bankName": "string",
+      "bankAddress": "string",
+      "method": "web3_wallet",
+      "country": "usa",
+      "bankAccountType": "string",
+      "bankRoutingNumber": "string",
+      "bankAccountNumber": "string",
+      "bankBeneficiaryName": "string",
+      "bankDepositMessage": "string",
+      "swiftCode": "string",
+      "feePercentage": "string"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/deposit-accounts
+Create virtual bank account
+
+
+Creates a new virtual bank account for USDC deposits
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "network": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "bankName": "string",
+  "bankAddress": "string",
+  "method": "web3_wallet",
+  "country": "usa",
+  "bankAccountType": "string",
+  "bankRoutingNumber": "string",
+  "bankAccountNumber": "string",
+  "bankBeneficiaryName": "string",
+  "bankDepositMessage": "string",
+  "swiftCode": "string",
+  "feePercentage": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/deposit-accounts/{id}
+Get deposit account
+
+
+Get a deposit account
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "bankName": "string",
+  "bankAddress": "string",
+  "method": "web3_wallet",
+  "country": "usa",
+  "bankAccountType": "string",
+  "bankRoutingNumber": "string",
+  "bankAccountNumber": "string",
+  "bankBeneficiaryName": "string",
+  "bankDepositMessage": "string",
+  "swiftCode": "string",
+  "feePercentage": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Payees
+
+
+GET
+/api/payees
+List of payees
+
+
+Returns the list of payees
+
+Parameters
+Try it out
+Name	Description
+page
+number
+(query)
+Page number. Starts from 1
+
+page
+limit
+number
+(query)
+Number of items per page
+
+limit
+searchText
+string
+(query)
+searchText
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "page": 1,
+  "limit": 10,
+  "count": 1,
+  "hasMore": true,
+  "data": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.089Z",
+      "updatedAt": "2025-03-23T21:01:16.090Z",
+      "organizationId": "string",
+      "nickName": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "string",
+      "phoneNumber": "string",
+      "displayName": "string",
+      "bankAccount": {
+        "country": "usa",
+        "bankName": "string",
+        "bankAddress": "string",
+        "type": "web3_wallet",
+        "bankAccountType": "savings",
+        "bankRoutingNumber": "string",
+        "bankAccountNumber": "string",
+        "bankBeneficiaryName": "string",
+        "bankBeneficiaryAddress": "string",
+        "swiftCode": "string"
+      },
+      "isGuest": true,
+      "hasBankAccount": true
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/payees
+Create payee
+
+
+Create a new payee
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "nickName": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "bankAccount": {
+    "country": "usa",
+    "bankName": "string",
+    "bankAddress": "string",
+    "type": "web3_wallet",
+    "bankAccountType": "savings",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankBeneficiaryName": "string",
+    "bankBeneficiaryAddress": "string",
+    "swiftCode": "string"
+  }
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.104Z",
+  "updatedAt": "2025-03-23T21:01:16.104Z",
+  "organizationId": "string",
+  "nickName": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "displayName": "string",
+  "bankAccount": {
+    "country": "usa",
+    "bankName": "string",
+    "bankAddress": "string",
+    "type": "web3_wallet",
+    "bankAccountType": "savings",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankBeneficiaryName": "string",
+    "bankBeneficiaryAddress": "string",
+    "swiftCode": "string"
+  },
+  "isGuest": true,
+  "hasBankAccount": true
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/payees/{id}
+Get payee
+
+
+Get a payee
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.114Z",
+  "updatedAt": "2025-03-23T21:01:16.114Z",
+  "organizationId": "string",
+  "nickName": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "displayName": "string",
+  "bankAccount": {
+    "country": "usa",
+    "bankName": "string",
+    "bankAddress": "string",
+    "type": "web3_wallet",
+    "bankAccountType": "savings",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankBeneficiaryName": "string",
+    "bankBeneficiaryAddress": "string",
+    "swiftCode": "string"
+  },
+  "isGuest": true,
+  "hasBankAccount": true
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+PUT
+/api/payees/{id}
+Update payee
+
+
+Update a new payee
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "nickName": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "phoneNumber": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.128Z",
+  "updatedAt": "2025-03-23T21:01:16.128Z",
+  "organizationId": "string",
+  "nickName": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "displayName": "string",
+  "bankAccount": {
+    "country": "usa",
+    "bankName": "string",
+    "bankAddress": "string",
+    "type": "web3_wallet",
+    "bankAccountType": "savings",
+    "bankRoutingNumber": "string",
+    "bankAccountNumber": "string",
+    "bankBeneficiaryName": "string",
+    "bankBeneficiaryAddress": "string",
+    "swiftCode": "string"
+  },
+  "isGuest": true,
+  "hasBankAccount": true
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+DELETE
+/api/payees/{id}
+Delete payee
+
+
+Delete a new payee
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "string",
+  "statusCode": 0
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Provider
+
+
+GET
+/api/providers
+List of providers
+
+
+Returns the list of providers
+
+Parameters
+Try it out
+Name	Description
+page
+number
+(query)
+Page number. Starts from 1
+
+page
+limit
+number
+(query)
+Number of items per page
+
+limit
+providerCode
+string
+(query)
+Available values : 0x0, 0x1, 0x2, 0x11, 0x21, 0x22, 0x31, 0x41, 0x23, 0x24, 0xffff
+
+
+--
+sync
+boolean
+(query)
+
+--
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "page": 1,
+  "limit": 10,
+  "count": 1,
+  "hasMore": true,
+  "data": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.150Z",
+      "updatedAt": "2025-03-23T21:01:16.150Z",
+      "organizationId": "string",
+      "status": "pending",
+      "providerCode": "0x0",
+      "providerData": {
+        "kycUrl": "string",
+        "tosUrl": "string",
+        "externalStatus": "string"
+      },
+      "externalKycId": "string",
+      "externalCustomerId": "string",
+      "supportRemittance": true,
+      "country": "string"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/providers
+Create provider
+
+
+Create a new provider
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "providerCode": "0x0",
+  "country": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.164Z",
+  "updatedAt": "2025-03-23T21:01:16.164Z",
+  "organizationId": "string",
+  "status": "pending",
+  "type": "individual",
+  "country": "string",
+  "providerCode": "0x0",
+  "kycProviderCode": "sumsub",
+  "kycDetailId": "string",
+  "kybDetailId": "string",
+  "kycDetail": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.164Z",
+    "updatedAt": "2025-03-23T21:01:16.164Z",
+    "organizationId": "string",
+    "kybDetailId": "string",
+    "nationality": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "middleName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "dateOfBirth": "string",
+    "addressLine1": "string",
+    "addressLine2": "string",
+    "city": "string",
+    "state": "string",
+    "postalCode": "string",
+    "country": "string",
+    "positionAtCompany": "string",
+    "sourceOfFund": "string",
+    "currentKycVerificationId": "string",
+    "currentKycVerification": {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.164Z",
+      "updatedAt": "2025-03-23T21:01:16.164Z",
+      "organizationId": "string",
+      "kycDetailId": "string",
+      "kycProviderCode": "sumsub",
+      "externalCustomerId": "string",
+      "externalKycId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "verifiedAt": "2025-03-23T21:01:16.164Z"
+    },
+    "kycDocuments": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.164Z",
+        "updatedAt": "2025-03-23T21:01:16.164Z",
+        "organizationId": "string",
+        "kycDetailId": "string",
+        "documentType": "passport",
+        "status": "pending",
+        "frontFileName": "string",
+        "backFileName": "string"
+      }
+    ],
+    "kycUrl": "string",
+    "uboType": "owner",
+    "percentageOfShares": 1,
+    "joiningDate": "2025-03-23T21:01:16.164Z"
+  },
+  "kybDetail": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.165Z",
+    "updatedAt": "2025-03-23T21:01:16.165Z",
+    "organizationId": "string",
+    "companyName": "string",
+    "companyDescription": "string",
+    "website": "string",
+    "incorporationDate": "2025-03-23T21:01:16.165Z",
+    "incorporationCountry": "string",
+    "incorporationNumber": "string",
+    "companyType": "string",
+    "companyTypeOther": "string",
+    "natureOfBusiness": "string",
+    "natureOfBusinessOther": "string",
+    "sourceOfFund": "string",
+    "sourceOfFundOther": "string",
+    "addressLine1": "string",
+    "addressLine2": "string",
+    "city": "string",
+    "state": "string",
+    "postalCode": "string",
+    "country": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "currentKybVerificationId": "string",
+    "currentKybVerification": {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.165Z",
+      "updatedAt": "2025-03-23T21:01:16.165Z",
+      "organizationId": "string",
+      "kybDetailId": "string",
+      "kybProviderCode": "sumsub",
+      "externalCustomerId": "string",
+      "externalKybId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "verifiedAt": "2025-03-23T21:01:16.165Z"
+    },
+    "kybDocuments": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.165Z",
+        "updatedAt": "2025-03-23T21:01:16.165Z",
+        "organizationId": "string",
+        "kybDetailId": "string",
+        "documentType": "certificate_of_incorporation",
+        "status": "pending",
+        "frontFileName": "string",
+        "backFileName": "string"
+      }
+    ],
+    "kycDetails": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.165Z",
+        "updatedAt": "2025-03-23T21:01:16.165Z",
+        "organizationId": "string",
+        "kybDetailId": "string",
+        "nationality": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "middleName": "string",
+        "email": "string",
+        "phoneNumber": "string",
+        "dateOfBirth": "string",
+        "addressLine1": "string",
+        "addressLine2": "string",
+        "city": "string",
+        "state": "string",
+        "postalCode": "string",
+        "country": "string",
+        "positionAtCompany": "string",
+        "sourceOfFund": "string",
+        "currentKycVerificationId": "string",
+        "currentKycVerification": {
+          "id": "string",
+          "createdAt": "2025-03-23T21:01:16.165Z",
+          "updatedAt": "2025-03-23T21:01:16.165Z",
+          "organizationId": "string",
+          "kycDetailId": "string",
+          "kycProviderCode": "sumsub",
+          "externalCustomerId": "string",
+          "externalKycId": "string",
+          "status": "pending",
+          "externalStatus": "string",
+          "verifiedAt": "2025-03-23T21:01:16.165Z"
+        },
+        "kycDocuments": [
+          {
+            "id": "string",
+            "createdAt": "2025-03-23T21:01:16.165Z",
+            "updatedAt": "2025-03-23T21:01:16.165Z",
+            "organizationId": "string",
+            "kycDetailId": "string",
+            "documentType": "passport",
+            "status": "pending",
+            "frontFileName": "string",
+            "backFileName": "string"
+          }
+        ],
+        "kycUrl": "string",
+        "uboType": "owner",
+        "percentageOfShares": 1,
+        "joiningDate": "2025-03-23T21:01:16.165Z"
+      }
+    ],
+    "sourceOfFundDescription": "string",
+    "expectedMonthlyVolume": 1,
+    "purposeOfFund": "business_transactions",
+    "purposeOfFundOther": "string",
+    "operatesInProhibitedCountries": true,
+    "taxIdentificationNumber": "string",
+    "highRiskActivities": [
+      "marijuana_or_related_services"
+    ]
+  },
+  "kycAdditionalDocuments": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.165Z",
+      "updatedAt": "2025-03-23T21:01:16.165Z",
+      "organizationId": "string",
+      "kycId": "string",
+      "name": "string",
+      "fileName": "string"
+    }
+  ],
+  "statusUpdates": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/providers/{id}
+Get provider
+
+
+Get a provider
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.200Z",
+  "updatedAt": "2025-03-23T21:01:16.200Z",
+  "organizationId": "string",
+  "status": "pending",
+  "type": "individual",
+  "country": "string",
+  "providerCode": "0x0",
+  "kycProviderCode": "sumsub",
+  "kycDetailId": "string",
+  "kybDetailId": "string",
+  "kycDetail": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.200Z",
+    "updatedAt": "2025-03-23T21:01:16.200Z",
+    "organizationId": "string",
+    "kybDetailId": "string",
+    "nationality": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "middleName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "dateOfBirth": "string",
+    "addressLine1": "string",
+    "addressLine2": "string",
+    "city": "string",
+    "state": "string",
+    "postalCode": "string",
+    "country": "string",
+    "positionAtCompany": "string",
+    "sourceOfFund": "string",
+    "currentKycVerificationId": "string",
+    "currentKycVerification": {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.200Z",
+      "updatedAt": "2025-03-23T21:01:16.200Z",
+      "organizationId": "string",
+      "kycDetailId": "string",
+      "kycProviderCode": "sumsub",
+      "externalCustomerId": "string",
+      "externalKycId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "verifiedAt": "2025-03-23T21:01:16.200Z"
+    },
+    "kycDocuments": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.200Z",
+        "updatedAt": "2025-03-23T21:01:16.200Z",
+        "organizationId": "string",
+        "kycDetailId": "string",
+        "documentType": "passport",
+        "status": "pending",
+        "frontFileName": "string",
+        "backFileName": "string"
+      }
+    ],
+    "kycUrl": "string",
+    "uboType": "owner",
+    "percentageOfShares": 1,
+    "joiningDate": "2025-03-23T21:01:16.200Z"
+  },
+  "kybDetail": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.200Z",
+    "updatedAt": "2025-03-23T21:01:16.200Z",
+    "organizationId": "string",
+    "companyName": "string",
+    "companyDescription": "string",
+    "website": "string",
+    "incorporationDate": "2025-03-23T21:01:16.200Z",
+    "incorporationCountry": "string",
+    "incorporationNumber": "string",
+    "companyType": "string",
+    "companyTypeOther": "string",
+    "natureOfBusiness": "string",
+    "natureOfBusinessOther": "string",
+    "sourceOfFund": "string",
+    "sourceOfFundOther": "string",
+    "addressLine1": "string",
+    "addressLine2": "string",
+    "city": "string",
+    "state": "string",
+    "postalCode": "string",
+    "country": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "currentKybVerificationId": "string",
+    "currentKybVerification": {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.200Z",
+      "updatedAt": "2025-03-23T21:01:16.200Z",
+      "organizationId": "string",
+      "kybDetailId": "string",
+      "kybProviderCode": "sumsub",
+      "externalCustomerId": "string",
+      "externalKybId": "string",
+      "status": "pending",
+      "externalStatus": "string",
+      "verifiedAt": "2025-03-23T21:01:16.200Z"
+    },
+    "kybDocuments": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.200Z",
+        "updatedAt": "2025-03-23T21:01:16.200Z",
+        "organizationId": "string",
+        "kybDetailId": "string",
+        "documentType": "certificate_of_incorporation",
+        "status": "pending",
+        "frontFileName": "string",
+        "backFileName": "string"
+      }
+    ],
+    "kycDetails": [
+      {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.200Z",
+        "updatedAt": "2025-03-23T21:01:16.200Z",
+        "organizationId": "string",
+        "kybDetailId": "string",
+        "nationality": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "middleName": "string",
+        "email": "string",
+        "phoneNumber": "string",
+        "dateOfBirth": "string",
+        "addressLine1": "string",
+        "addressLine2": "string",
+        "city": "string",
+        "state": "string",
+        "postalCode": "string",
+        "country": "string",
+        "positionAtCompany": "string",
+        "sourceOfFund": "string",
+        "currentKycVerificationId": "string",
+        "currentKycVerification": {
+          "id": "string",
+          "createdAt": "2025-03-23T21:01:16.200Z",
+          "updatedAt": "2025-03-23T21:01:16.200Z",
+          "organizationId": "string",
+          "kycDetailId": "string",
+          "kycProviderCode": "sumsub",
+          "externalCustomerId": "string",
+          "externalKycId": "string",
+          "status": "pending",
+          "externalStatus": "string",
+          "verifiedAt": "2025-03-23T21:01:16.200Z"
+        },
+        "kycDocuments": [
+          {
+            "id": "string",
+            "createdAt": "2025-03-23T21:01:16.200Z",
+            "updatedAt": "2025-03-23T21:01:16.200Z",
+            "organizationId": "string",
+            "kycDetailId": "string",
+            "documentType": "passport",
+            "status": "pending",
+            "frontFileName": "string",
+            "backFileName": "string"
+          }
+        ],
+        "kycUrl": "string",
+        "uboType": "owner",
+        "percentageOfShares": 1,
+        "joiningDate": "2025-03-23T21:01:16.200Z"
+      }
+    ],
+    "sourceOfFundDescription": "string",
+    "expectedMonthlyVolume": 1,
+    "purposeOfFund": "business_transactions",
+    "purposeOfFundOther": "string",
+    "operatesInProhibitedCountries": true,
+    "taxIdentificationNumber": "string",
+    "highRiskActivities": [
+      "marijuana_or_related_services"
+    ]
+  },
+  "kycAdditionalDocuments": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.200Z",
+      "updatedAt": "2025-03-23T21:01:16.200Z",
+      "organizationId": "string",
+      "kycId": "string",
+      "name": "string",
+      "fileName": "string"
+    }
+  ],
+  "statusUpdates": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/providers/bridge-tos-link
+Get bridge tos link
+
+
+Get the bridge tos link
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+"string"
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/providers/submit-kyc-on-partner
+Submit kyc on partner side
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "kycId": "string",
+  "providerCode": "0x0",
+  "auto": true,
+  "state": "string",
+  "tax_identification_number": "string",
+  "gov_id_number": "string",
+  "business_industry": "string",
+  "country": "string",
+  "ubo_details": [
+    {
+      "state": "string",
+      "has_ownership": true,
+      "is_signer": true,
+      "has_control": true,
+      "relationship_established_at": "string",
+      "tax_identification_number": "string",
+      "ownership_percent": 1,
+      "gov_id_number": "string"
+    }
+  ],
+  "signedAgreementId": "string",
+  "isAdminSubmit": true
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.234Z",
+  "updatedAt": "2025-03-23T21:01:16.234Z",
+  "organizationId": "string",
+  "status": "pending",
+  "providerCode": "0x0",
+  "providerData": {
+    "kycUrl": "string",
+    "tosUrl": "string",
+    "externalStatus": "string"
+  },
+  "externalKycId": "string",
+  "externalCustomerId": "string",
+  "supportRemittance": true,
+  "country": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Quote
+
+
+POST
+/api/quotes/offramp
+Get offramp quote
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "preferredDestinationPaymentMethods": [
+    "string"
+  ],
+  "preferredProviderId": "string",
+  "thirdPartyPayment": true,
+  "destinationCurrency": "USD",
+  "onlyRemittance": true,
+  "preferredBankAccountId": "string",
+  "payeeId": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "minAmount": "9223372036854775807",
+  "maxAmount": "9223372036854775807",
+  "arrivalTimeMessage": "9223372036854775807",
+  "provider": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.244Z",
+    "updatedAt": "2025-03-23T21:01:16.244Z",
+    "organizationId": "string",
+    "status": "pending",
+    "providerCode": "0x0",
+    "providerData": {
+      "kycUrl": "string",
+      "tosUrl": "string",
+      "externalStatus": "string"
+    },
+    "externalKycId": "string",
+    "externalCustomerId": "string",
+    "supportRemittance": true,
+    "country": "string"
+  },
+  "error": "string",
+  "quotePayload": "string",
+  "quoteSignature": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/quotes/onramp
+Get onramp quote
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "preferredSourcePaymentMethods": [
+    "string"
+  ],
+  "preferredProviderId": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "minAmount": "9223372036854775807",
+  "maxAmount": "9223372036854775807",
+  "arrivalTimeMessage": "9223372036854775807",
+  "provider": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.252Z",
+    "updatedAt": "2025-03-23T21:01:16.252Z",
+    "organizationId": "string",
+    "status": "pending",
+    "providerCode": "0x0",
+    "providerData": {
+      "kycUrl": "string",
+      "tosUrl": "string",
+      "externalStatus": "string"
+    },
+    "externalKycId": "string",
+    "externalCustomerId": "string",
+    "supportRemittance": true,
+    "country": "string"
+  },
+  "error": "string",
+  "quotePayload": "string",
+  "quoteSignature": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/quotes/public-offramp
+Get public offramp quote
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "sourceCountry": "usa",
+  "destinationCountry": "string",
+  "amount": "9223372036854775807"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "minAmount": "9223372036854775807",
+  "maxAmount": "9223372036854775807",
+  "arrivalTimeMessage": "9223372036854775807",
+  "provider": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.263Z",
+    "updatedAt": "2025-03-23T21:01:16.263Z",
+    "organizationId": "string",
+    "status": "pending",
+    "providerCode": "0x0",
+    "providerData": {
+      "kycUrl": "string",
+      "tosUrl": "string",
+      "externalStatus": "string"
+    },
+    "externalKycId": "string",
+    "externalCustomerId": "string",
+    "supportRemittance": true,
+    "country": "string"
+  },
+  "error": "string",
+  "quotePayload": "string",
+  "quoteSignature": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+Schedule
+
+
+GET
+/api/transfer-schedules
+List of transfer schedules
+
+
+Parameters
+Try it out
+Name	Description
+page
+number
+(query)
+Page number. Starts from 1
+
+page
+limit
+number
+(query)
+Number of items per page
+
+limit
+email
+string
+(query)
+email
+payeeId
+string
+(query)
+payeeId
+status
+string
+(query)
+Available values : active, inactive
+
+
+--
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "page": 1,
+  "limit": 10,
+  "count": 1,
+  "hasMore": true,
+  "data": [
+    {
+      "id": "string",
+      "createdAt": "2025-03-23T21:01:16.276Z",
+      "updatedAt": "2025-03-23T21:01:16.276Z",
+      "organizationId": "string",
+      "status": "active",
+      "type": "on_ramp",
+      "sourceCountry": "usa",
+      "destinationCountry": "usa",
+      "amount": "9223372036854775807",
+      "currency": "USD",
+      "purposeCode": "self",
+      "sourceOfFunds": "salary",
+      "recipientRelationship": "self",
+      "walletAddress": "string",
+      "email": "string",
+      "payeeId": "string",
+      "payee": {
+        "id": "string",
+        "createdAt": "2025-03-23T21:01:16.276Z",
+        "updatedAt": "2025-03-23T21:01:16.276Z",
+        "organizationId": "string",
+        "nickName": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "phoneNumber": "string",
+        "displayName": "string",
+        "bankAccount": {
+          "country": "usa",
+          "bankName": "string",
+          "bankAddress": "string",
+          "type": "web3_wallet",
+          "bankAccountType": "savings",
+          "bankRoutingNumber": "string",
+          "bankAccountNumber": "string",
+          "bankBeneficiaryName": "string",
+          "bankBeneficiaryAddress": "string",
+          "swiftCode": "string"
+        },
+        "isGuest": true,
+        "hasBankAccount": true
+      },
+      "repeatType": "daily",
+      "schedule": "string"
+    }
+  ]
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfer-schedules
+Create transfer schedule
+
+
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "amount": "9223372036854775807",
+  "purposeCode": "self",
+  "walletAddress": "string",
+  "email": "string",
+  "payeeId": "string",
+  "repeatType": "daily",
+  "schedule": "string"
+}
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.292Z",
+  "updatedAt": "2025-03-23T21:01:16.292Z",
+  "organizationId": "string",
+  "status": "active",
+  "type": "on_ramp",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "walletAddress": "string",
+  "email": "string",
+  "payeeId": "string",
+  "payee": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.292Z",
+    "updatedAt": "2025-03-23T21:01:16.292Z",
+    "organizationId": "string",
+    "nickName": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "displayName": "string",
+    "bankAccount": {
+      "country": "usa",
+      "bankName": "string",
+      "bankAddress": "string",
+      "type": "web3_wallet",
+      "bankAccountType": "savings",
+      "bankRoutingNumber": "string",
+      "bankAccountNumber": "string",
+      "bankBeneficiaryName": "string",
+      "bankBeneficiaryAddress": "string",
+      "swiftCode": "string"
+    },
+    "isGuest": true,
+    "hasBankAccount": true
+  },
+  "repeatType": "daily",
+  "schedule": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+GET
+/api/transfer-schedules/{id}
+Get transfer schedules
+
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.303Z",
+  "updatedAt": "2025-03-23T21:01:16.303Z",
+  "organizationId": "string",
+  "status": "active",
+  "type": "on_ramp",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "walletAddress": "string",
+  "email": "string",
+  "payeeId": "string",
+  "payee": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.303Z",
+    "updatedAt": "2025-03-23T21:01:16.303Z",
+    "organizationId": "string",
+    "nickName": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "displayName": "string",
+    "bankAccount": {
+      "country": "usa",
+      "bankName": "string",
+      "bankAddress": "string",
+      "type": "web3_wallet",
+      "bankAccountType": "savings",
+      "bankRoutingNumber": "string",
+      "bankAccountNumber": "string",
+      "bankBeneficiaryName": "string",
+      "bankBeneficiaryAddress": "string",
+      "swiftCode": "string"
+    },
+    "isGuest": true,
+    "hasBankAccount": true
+  },
+  "repeatType": "daily",
+  "schedule": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}
+No links
+
+POST
+/api/transfer-schedules/{id}/deactivate
+Deactivate transfer schedule
+
+
+Parameters
+Try it out
+Name	Description
+id *
+string
+(path)
+id
+Responses
+Code	Description	Links
+200	
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": "string",
+  "createdAt": "2025-03-23T21:01:16.314Z",
+  "updatedAt": "2025-03-23T21:01:16.314Z",
+  "organizationId": "string",
+  "status": "active",
+  "type": "on_ramp",
+  "sourceCountry": "usa",
+  "destinationCountry": "usa",
+  "amount": "9223372036854775807",
+  "currency": "USD",
+  "purposeCode": "self",
+  "sourceOfFunds": "salary",
+  "recipientRelationship": "self",
+  "walletAddress": "string",
+  "email": "string",
+  "payeeId": "string",
+  "payee": {
+    "id": "string",
+    "createdAt": "2025-03-23T21:01:16.314Z",
+    "updatedAt": "2025-03-23T21:01:16.314Z",
+    "organizationId": "string",
+    "nickName": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "displayName": "string",
+    "bankAccount": {
+      "country": "usa",
+      "bankName": "string",
+      "bankAddress": "string",
+      "type": "web3_wallet",
+      "bankAccountType": "savings",
+      "bankRoutingNumber": "string",
+      "bankAccountNumber": "string",
+      "bankBeneficiaryName": "string",
+      "bankBeneficiaryAddress": "string",
+      "swiftCode": "string"
+    },
+    "isGuest": true,
+    "hasBankAccount": true
+  },
+  "repeatType": "daily",
+  "schedule": "string"
+}
+No links
+500	
+Media type
+
+application/json
+Example Value
+Schema
+{
+  "message": {},
+  "statusCode": 0,
+  "error": "string"
+}

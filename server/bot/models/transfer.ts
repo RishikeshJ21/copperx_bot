@@ -1,50 +1,123 @@
 /**
  * Transfer interface
- * Represents a transfer transaction
+ * Represents a transfer transaction based on API response
  */
 export interface Transfer {
   id: string;
-  transferId: string;
+  createdAt: string;
+  updatedAt: string;
+  organizationId: string;
+  status: TransferStatus;
+  customerId?: string;
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+    country: string;
+  };
   type: TransferType;
+  sourceCountry?: string;
+  destinationCountry?: string;
+  destinationCurrency?: string;
   amount: string;
   currency: string;
-  status: TransferStatus;
+  amountSubtotal?: string;
+  totalFee?: string;
+  feePercentage?: string;
+  feeCurrency?: string;
+  invoiceNumber?: string;
+  invoiceUrl?: string;
+  sourceOfFundsFile?: string;
+  note?: string;
+  purposeCode?: string;
+  sourceOfFunds?: string;
+  recipientRelationship?: string;
+  sourceAccountId?: string;
+  destinationAccountId?: string;
+  paymentUrl?: string;
+  mode?: 'on_ramp' | 'off_ramp';
+  isThirdPartyPayment?: boolean;
+  
+  // Backward compatibility for our existing code
+  transferId?: string;
   network?: string;
   recipient?: string;
   senderEmail?: string;
   recipientEmail?: string;
   walletAddress?: string;
   bankDetails?: BankDetails;
-  createdAt: string;
   completedAt?: string;
   direction?: 'in' | 'out';
   fee?: string;
   metadata?: any;
+  
+  // Account information
+  sourceAccount?: {
+    id: string;
+    type: string;
+    country: string;
+    network?: string;
+    walletAddress?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+  };
+  
+  destinationAccount?: {
+    id: string;
+    type: string;
+    country: string;
+    network?: string;
+    walletAddress?: string;
+    bankName?: string;
+    bankAccountNumber?: string;
+  };
+  
+  // Transactions related to this transfer
+  transactions?: {
+    id: string;
+    status: string;
+    type: string;
+    fromAmount: string;
+    fromCurrency: string;
+    toAmount: string;
+    toCurrency: string;
+    totalFee: string;
+    feeCurrency: string;
+    transactionHash?: string;
+  }[];
 }
 
 /**
  * Transfer type enum
- * Types of transfers supported by the platform
+ * Types of transfers supported by the platform as defined in the API
  */
 export enum TransferType {
   DEPOSIT = 'deposit',
   WITHDRAWAL = 'withdrawal',
+  WITHDRAW = 'withdraw', // API variant
   SEND = 'send',
   RECEIVE = 'receive',
   BRIDGE = 'bridge',
   BANK = 'bank',
+  BANK_DEPOSIT = 'bank_deposit',
+  ON_RAMP = 'on_ramp',
+  OFF_RAMP = 'off_ramp',
 }
 
 /**
  * Transfer status enum
- * Possible states of a transfer
+ * Possible states of a transfer as defined in the API
  */
 export enum TransferStatus {
   PENDING = 'pending',
+  INITIATED = 'initiated',
   PROCESSING = 'processing',
-  COMPLETED = 'completed',
+  SUCCESS = 'success',
+  COMPLETED = 'completed', // For backward compatibility
+  CANCELED = 'canceled',
+  CANCELLED = 'cancelled', // For backward compatibility
   FAILED = 'failed',
-  CANCELLED = 'cancelled',
+  REFUNDED = 'refunded',
 }
 
 /**
@@ -206,4 +279,48 @@ export interface SendState {
   network?: string;
   fee?: string;
   wallets?: any[];
+}
+
+/**
+ * On-Ramp Transfer Request
+ * For converting fiat to USDC
+ */
+export interface OnRampTransferRequest {
+  invoiceNumber?: string;
+  invoiceUrl?: string;
+  purposeCode?: string;
+  sourceOfFunds?: string;
+  recipientRelationship?: string;
+  quotePayload?: string;
+  quoteSignature?: string;
+  preferredWalletId?: string;
+  customerData?: {
+    name: string;
+    businessName?: string;
+    email: string;
+    country: string;
+  };
+}
+
+/**
+ * Off-Ramp Transfer Request
+ * For converting USDC to fiat
+ */
+export interface OffRampTransferRequest {
+  invoiceNumber?: string;
+  invoiceUrl?: string;
+  purposeCode?: string;
+  sourceOfFunds?: string;
+  recipientRelationship?: string;
+  quotePayload?: string;
+  quoteSignature?: string;
+  preferredWalletId?: string;
+  customerData?: {
+    name: string;
+    businessName?: string;
+    email: string;
+    country: string;
+  };
+  sourceOfFundsFile?: string;
+  note?: string;
 }

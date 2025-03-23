@@ -1,7 +1,7 @@
 import { Telegraf, Markup } from 'telegraf';
 import { message } from 'telegraf/filters';
 import { getWalletBalances } from '../api/wallet';
-import { withdrawToWallet, withdrawToBank } from '../api/transfer';
+import { withdrawToWallet, withdrawToBank, getTransferQuote } from '../api/transfer';
 import { formatCurrency } from '../utils/format';
 import { isValidWalletAddress, isValidAmount, isValidBankDetails } from '../utils/validation';
 
@@ -395,7 +395,7 @@ async function processWithdrawal(ctx: any) {
         ctx.session.auth.accessToken,
         withdrawState.amount!,
         withdrawState.network!,
-        withdrawState.bankDetails
+        withdrawState.bankDetails!
       );
     }
     
