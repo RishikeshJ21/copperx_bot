@@ -9,12 +9,10 @@ import { WalletBalance, TokenBalance, WalletOperationResponse, DepositAddress, W
  */
 export async function getDepositAddress(accessToken: string, network: string) {
   try {
-    // Note: This endpoint wasn't found in the documentation, but we're keeping it for compatibility
-    // Using a wallet generation endpoint as a fallback
     return await apiRequest<DepositAddress>({
-      method: 'POST',
-      url: '/api/wallets',
-      data: { network },
+      method: 'GET',
+      url: '/api/wallet/deposit-address',
+      params: { network },
       accessToken
     });
   } catch (error: any) {
@@ -32,7 +30,7 @@ export async function getWalletBalances(accessToken: string): Promise<WalletBala
   try {
     const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
-      url: '/api/wallets/balances',
+      url: '/api/wallet/balances',
       accessToken
     });
     
@@ -58,7 +56,7 @@ export async function setDefaultWallet(accessToken: string, walletId: string) {
   try {
     return await apiRequest<any>({
       method: 'POST',
-      url: '/api/wallets/default',
+      url: '/api/wallet/default',
       data: { walletId },
       accessToken
     });
@@ -77,7 +75,7 @@ export async function getDefaultWallet(accessToken: string): Promise<WalletBalan
   try {
     return await apiRequest<WalletBalance>({
       method: 'GET',
-      url: '/api/wallets/default',
+      url: '/api/wallet/default',
       accessToken
     });
   } catch (error: any) {
@@ -95,7 +93,7 @@ export async function getDefaultWalletBalance(accessToken: string): Promise<Toke
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
-      url: '/api/wallets/balance',
+      url: '/api/wallet/balance',
       accessToken
     });
   } catch (error: any) {
@@ -113,7 +111,7 @@ export async function getAllWallets(accessToken: string): Promise<WalletBalanceR
   try {
     const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
-      url: '/api/wallets',
+      url: '/api/wallet',
       accessToken
     });
     
@@ -138,7 +136,7 @@ export async function getSupportedNetworks(accessToken: string): Promise<string[
   try {
     return await apiRequest<string[]>({
       method: 'GET',
-      url: '/api/wallets/networks',
+      url: '/api/wallet/networks',
       accessToken
     });
   } catch (error: any) {
@@ -158,7 +156,7 @@ export async function getTokenBalance(accessToken: string, chainId: string, toke
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
-      url: `/api/wallets/${chainId}/tokens/${token}/balance`,
+      url: `/api/wallet/${chainId}/tokens/${token}/balance`,
       accessToken
     });
   } catch (error: any) {
