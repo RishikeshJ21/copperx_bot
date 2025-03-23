@@ -324,3 +324,81 @@ export interface OffRampTransferRequest {
   sourceOfFundsFile?: string;
   note?: string;
 }
+
+/**
+ * Transfer schedule frequency
+ * Possible frequency options for scheduled transfers
+ */
+export enum ScheduleFrequency {
+  ONCE = 'once',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  BIWEEKLY = 'biweekly',
+  MONTHLY = 'monthly',
+  QUARTERLY = 'quarterly'
+}
+
+/**
+ * Transfer schedule interface
+ * For creating and managing recurring transfers
+ */
+export interface TransferSchedule {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  organizationId: string;
+  status: 'active' | 'paused' | 'completed' | 'cancelled' | 'failed';
+  type: 'withdrawal' | 'send' | 'bridge';
+  frequency: ScheduleFrequency;
+  nextExecutionDate: string;
+  lastExecutionDate?: string;
+  endDate?: string;
+  amount: string;
+  currency: string;
+  network?: string;
+  sourceNetwork?: string;
+  targetNetwork?: string;
+  recipient?: string;
+  recipientType?: 'email' | 'wallet' | 'bank';
+  recipientAddress?: string;
+  recipientEmail?: string;
+  recipientBankDetails?: {
+    bankName?: string;
+    accountName?: string;
+    accountNumber?: string;
+    routingNumber?: string;
+    country?: string;
+  };
+  note?: string;
+  executionCount: number;
+  totalExecutions?: number;
+  transferIds: string[];
+}
+
+/**
+ * Schedule create request interface
+ * Data required to create a scheduled transfer
+ */
+export interface CreateScheduleRequest {
+  type: 'withdrawal' | 'send' | 'bridge';
+  frequency: ScheduleFrequency;
+  amount: string;
+  currency: string;
+  network?: string;
+  sourceNetwork?: string;
+  targetNetwork?: string;
+  recipientType?: 'email' | 'wallet' | 'bank';
+  recipientAddress?: string;
+  recipientEmail?: string;
+  recipientBankDetails?: {
+    bankName?: string;
+    accountName?: string;
+    accountNumber?: string;
+    routingNumber?: string;
+    country?: string;
+  };
+  startDate?: string;
+  endDate?: string;
+  totalExecutions?: number;
+  note?: string;
+}

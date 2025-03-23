@@ -28,6 +28,14 @@ export interface BaseSessionState {
   withdraw?: any;
   deposit?: any;
   
+  // Referral management
+  referralCodeInput?: boolean;
+  referralCode?: string;
+  points?: {
+    total?: number;
+    lastUpdated?: Date;
+  };
+  
   // Filters and preferences
   historyFilter?: string;
   
@@ -36,6 +44,7 @@ export interface BaseSessionState {
     balance?: Date;
     kyc?: Date;
     history?: Date;
+    points?: Date;
   };
 }
 
