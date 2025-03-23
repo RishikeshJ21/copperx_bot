@@ -1,6 +1,109 @@
+# Dependencies
 node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp
+.pnp.js
+
+# Build outputs
 dist
-.DS_Store
+build
+out
+.next
+.nuxt
+.output
+.cache
 server/public
+
+# Environment variables and secrets
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+.secret*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+.playwright
+
+# Editor and IDE files
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+.temp
+.tmp
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Build tools
 vite.config.ts.*
+.eslintcache
+.stylelintcache
+.turbo
+
+# Misc
+*.tgz
 *.tar.gz
+*.zip
+*.rar
+.vercel
+.netlify
+
+# Bot specific
+telegram-session-*
+bot-data/
+
+# Drizzle
+.drizzle/
+drizzle-output/
+migrations/
+
+# TypeScript
+*.tsbuildinfo
