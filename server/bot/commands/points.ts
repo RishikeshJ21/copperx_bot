@@ -60,6 +60,10 @@ async function handlePointsCommand(ctx: CopperxContext) {
     // Build message
     let message = `🏆 *Your Copperx Points*\n\n`;
     message += `Total Points: *${pointsData.total}*\n\n`;
+    message += `Points can be earned by:\n`;
+    message += `• Making transactions on the platform\n`;
+    message += `• Referring new users with your referral code\n`;
+    message += `• Completing special promotions\n\n`;
     message += `What would you like to do?`;
     
     // Create buttons for points actions
@@ -99,7 +103,7 @@ async function showReferralCode(ctx: CopperxContext) {
       return ctx.reply('❌ You don\'t have a referral code yet. Please contact support.');
     }
     
-    // Build share URL (replace with actual sharing URL if available)
+    // Build share URL 
     const shareUrl = `https://app.copperx.io/signup?referral=${orgInfo.referralCode}`;
     
     // Build message
@@ -112,23 +116,28 @@ async function showReferralCode(ctx: CopperxContext) {
     message += `3. Earn additional points when your referrals complete transactions\n\n`;
     message += `*Referral Link:*\n${shareUrl}`;
     
+    // Create a more descriptive share message
+    const shareMessage = 'Join Copperx - the stablecoin bank for international payments! Use my referral code and we both get bonus points!';
+    
     // Create buttons for sharing and copying
     const buttons = Markup.inlineKeyboard([
       [
         Markup.button.callback('📋 Copy Code', `copy_code_${orgInfo.referralCode}`),
-        Markup.button.url('🔄 Share Link', `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Join Copperx using my referral code and we both get bonus points!')}`)
+        Markup.button.url('🔄 Share Link', `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareMessage)}`)
       ],
       [Markup.button.callback('⬅️ Back to Points', 'points_menu')]
     ]);
     
-    // First send message with disable_web_page_preview
+    // Send message with the buttons
     await ctx.reply(message, {
-      parse_mode: 'Markdown',
-      disable_web_page_preview: true
+      parse_mode: 'Markdown', 
+      reply_markup: buttons.reply_markup
     });
     
-    // Then send buttons separately
-    await ctx.reply('Choose an option:', buttons);
+    // Then send the "how to share" message
+    await ctx.reply('💡 *Tip*: Tap on the code above to copy it or use the "Share Link" button to easily share your referral link with friends.', {
+      parse_mode: 'Markdown'
+    });
   } catch (error: any) {
     console.error('Error showing referral code:', error);
     await ctx.reply(`❌ Error retrieving your referral code: ${error.message}\n\nPlease try again later.`);
@@ -146,9 +155,9 @@ async function copyReferralCode(ctx: CopperxContext) {
     const callbackData = ctx.callbackQuery?.data || '';
     const referralCode = callbackData.replace('copy_code_', '');
     
-    await ctx.answerCbQuery('Just tap to copy the code below');
+    await ctx.answerCbQuery('Code ready to copy!');
     
-    await ctx.reply(`*Your Referral Code:*\n\n\`${referralCode}\`\n\nTap the code above to copy it.`, {
+    await ctx.reply(`*Your Referral Code:*\n\n\`${referralCode}\`\n\n✅ This code is formatted for easy copying.\n\n📋 *How to copy:* Simply tap on the code above, and it will be copied to your clipboard.`, {
       parse_mode: 'Markdown'
     });
   } catch (error: any) {
