@@ -25,10 +25,11 @@ export const config = {
     maxWithdrawalAmount: 1000, // Maximum amount for withdrawal
   },
   pusher: {
-    key: 'dabe49bce76f0280d338',
+    key: 'dfd03c59f991f1191e95',
     cluster: 'ap2',
     authEndpoint: '/api/pusher/auth',
-    app_id: '1956356',
+    app_id: '1963059',
+    secret: 'bb3c20deb6ae8cdbe591',
   },
   notifications: {
     enabled: true,

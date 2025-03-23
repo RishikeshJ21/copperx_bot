@@ -4,15 +4,16 @@ import { WalletBalance, TokenBalance, WalletOperationResponse, DepositAddress, W
 /**
  * Get deposit address for a specific network
  * @param accessToken User's access token
- * @param network Blockchain network (e.g., 'solana', 'ethereum')
+ * @param network Blockchain network (e.g., '137' for Polygon)
  * @returns Deposit address information
  */
 export async function getDepositAddress(accessToken: string, network: string) {
   try {
+    // Generate or get existing wallet for the network
     return await apiRequest<DepositAddress>({
-      method: 'GET',
-      url: '/api/wallet/deposit-address',
-      params: { network },
+      method: 'POST',
+      url: '/api/wallets',
+      data: { network },
       accessToken
     });
   } catch (error: any) {
@@ -22,7 +23,7 @@ export async function getDepositAddress(accessToken: string, network: string) {
 }
 
 /**
- * Get wallet balances for a user
+ * Get wallet balances for a user across all networks
  * @param accessToken User's access token
  * @returns Wallet balances across networks
  */
@@ -30,7 +31,7 @@ export async function getWalletBalances(accessToken: string): Promise<WalletBala
   try {
     const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
-      url: '/api/wallet/balances',
+      url: '/api/wallets/balances',
       accessToken
     });
     
@@ -56,7 +57,7 @@ export async function setDefaultWallet(accessToken: string, walletId: string) {
   try {
     return await apiRequest<any>({
       method: 'POST',
-      url: '/api/wallet/default',
+      url: '/api/wallets/default',
       data: { walletId },
       accessToken
     });
@@ -75,7 +76,7 @@ export async function getDefaultWallet(accessToken: string): Promise<WalletBalan
   try {
     return await apiRequest<WalletBalance>({
       method: 'GET',
-      url: '/api/wallet/default',
+      url: '/api/wallets/default',
       accessToken
     });
   } catch (error: any) {
@@ -93,7 +94,7 @@ export async function getDefaultWalletBalance(accessToken: string): Promise<Toke
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
-      url: '/api/wallet/balance',
+      url: '/api/wallets/balance',
       accessToken
     });
   } catch (error: any) {
@@ -111,7 +112,7 @@ export async function getAllWallets(accessToken: string): Promise<WalletBalanceR
   try {
     const response = await apiRequest<WalletBalance[]>({
       method: 'GET',
-      url: '/api/wallet',
+      url: '/api/wallets',
       accessToken
     });
     
@@ -136,7 +137,7 @@ export async function getSupportedNetworks(accessToken: string): Promise<string[
   try {
     return await apiRequest<string[]>({
       method: 'GET',
-      url: '/api/wallet/networks',
+      url: '/api/wallets/networks',
       accessToken
     });
   } catch (error: any) {
@@ -156,11 +157,47 @@ export async function getTokenBalance(accessToken: string, chainId: string, toke
   try {
     return await apiRequest<TokenBalance>({
       method: 'GET',
-      url: `/api/wallet/${chainId}/tokens/${token}/balance`,
+      url: `/api/wallets/${chainId}/tokens/${token}/balance`,
       accessToken
     });
   } catch (error: any) {
     console.error('Failed to get token balance:', error);
     throw new Error(`Failed to retrieve token balance: ${error.message}`);
+  }
+}
+
+/**
+ * Recover tokens from wallet
+ * @param accessToken User's access token
+ * @param chainId Chain ID (e.g., '137' for Polygon)
+ * @param amount Amount to recover
+ * @param currency Currency symbol (e.g., 'USD')
+ * @param toAccount Recipient account
+ * @returns Operation result
+ */
+export async function recoverTokens(
+  accessToken: string,
+  chainId: string,
+  amount: string,
+  currency: string,
+  toAccount: string,
+  organizationId?: string
+): Promise<string> {
+  try {
+    return await apiRequest<string>({
+      method: 'POST',
+      url: '/api/wallets/recover-tokens',
+      data: {
+        chainId,
+        amount,
+        currency,
+        toAccount,
+        organizationId
+      },
+      accessToken
+    });
+  } catch (error: any) {
+    console.error('Failed to recover tokens:', error);
+    throw new Error(`Failed to recover tokens: ${error.message}`);
   }
 }
