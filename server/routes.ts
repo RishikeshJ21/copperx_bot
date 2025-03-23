@@ -8,10 +8,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "active" });
   });
 
-  // Webhook endpoint for Telegram bot (optional, can be used instead of polling)
-  app.post("/api/telegram/webhook", (req, res) => {
-    // This would be used if you're configuring a webhook with Telegram
-    res.sendStatus(200);
+  // Webhook endpoint for Telegram bot
+  app.post("/webhook", async (req, res) => {
+    try {
+      // Verify the secret token if provided (for added security)
+      const secretPathComponent = process.env.TELEGRAM_WEBHOOK_SECRET;
+      if (secretPathComponent) {
+        const token = req.query.token;
+        if (token !== secretPathComponent) {
+          console.warn(`Webhook request with invalid token: ${token}`);
+          return res.sendStatus(403); // Forbidden
+        }
+      }
+      
+      // Import the bot from the bot module to ensure it's initialized
+      const { initializeBot } = await import('./bot');
+      const bot = initializeBot();
+      
+      // Process the update
+      await bot.handleUpdate(req.body);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error('Error processing webhook update:', error);
+      res.sendStatus(500);
+    }
   });
 
   const httpServer = createServer(app);

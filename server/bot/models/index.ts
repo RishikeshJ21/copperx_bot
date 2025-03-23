@@ -9,6 +9,17 @@ type SceneSessionData = {
 };
 
 /**
+ * Admin state in session
+ * Tracks admin-specific flow states
+ */
+export interface AdminState {
+  awaitingBroadcast?: boolean;
+  broadcastMessage?: string;
+  broadcastTarget?: 'all' | 'active' | 'verified';
+  broadcastPreview?: string;
+}
+
+/**
  * Base session state interface
  * Contains properties that should be available across all contexts
  */
@@ -27,6 +38,9 @@ export interface BaseSessionState {
   send?: any;
   withdraw?: any;
   deposit?: any;
+  
+  // Admin state
+  adminState?: AdminState;
   
   // Referral management
   referralCodeInput?: boolean;

@@ -12,6 +12,10 @@ export const config = {
   bot: {
     name: 'Copperx Payout Bot',
     description: 'Manage your Copperx payouts and transfers through Telegram',
+    admin: {
+      telegramId: 626243777,
+      username: 'Rish_w3b',
+    },
   },
   auth: {
     tokenExpiryBuffer: 300, // 5 minutes buffer before token expires

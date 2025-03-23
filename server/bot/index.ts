@@ -65,13 +65,19 @@ export async function startBot() {
   try {
     const bot = initializeBot();
     
-    // Set up webhooks if in production environment, otherwise use long polling
-    if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_DOMAIN) {
-      const webhookDomain = process.env.WEBHOOK_DOMAIN;
-      const webhookPath = process.env.WEBHOOK_PATH || '/webhook';
+    // Set up webhooks if webhook domain is configured, otherwise use long polling
+    if (process.env.TELEGRAM_WEBHOOK_DOMAIN) {
+      const webhookDomain = process.env.TELEGRAM_WEBHOOK_DOMAIN;
+      const webhookPath = process.env.TELEGRAM_WEBHOOK_PATH || '/webhook';
+      const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
       
-      await bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
-      console.log(`Webhook set: ${webhookDomain}${webhookPath}`);
+      // If a secret is provided, include it as a query parameter
+      const webhookUrl = webhookSecret
+        ? `${webhookDomain}${webhookPath}?token=${webhookSecret}`
+        : `${webhookDomain}${webhookPath}`;
+      
+      await bot.telegram.setWebhook(webhookUrl);
+      console.log(`Webhook set: ${webhookUrl.replace(webhookSecret || '', '[SECRET]')}`);
     } else {
       // Use long polling - try-catch to prevent duplicate launches
       try {
