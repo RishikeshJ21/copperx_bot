@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { initializeBot } from "./bot";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API routes for the web interface, if needed
@@ -8,9 +9,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "active" });
   });
 
+  // Add an endpoint to verify webhook is accessible
+  app.get("/webhook", (req, res) => {
+    res.json({ status: "webhook endpoint active" });
+  });
+
   // Webhook endpoint for Telegram bot
   app.post("/webhook", async (req, res) => {
     try {
+      console.log("Webhook request received", req.query);
+      
       // Verify the secret token if provided (for added security)
       const secretPathComponent = process.env.TELEGRAM_WEBHOOK_SECRET;
       if (secretPathComponent) {
@@ -21,12 +29,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Import the bot from the bot module to ensure it's initialized
-      const { initializeBot } = await import('./bot');
+      // Initialize bot
       const bot = initializeBot();
+      
+      if (!req.body) {
+        console.warn('Empty update received');
+        return res.sendStatus(400);
+      }
+      
+      console.log('Processing webhook update');
       
       // Process the update
       await bot.handleUpdate(req.body);
+      console.log('Update processed successfully');
       res.sendStatus(200);
     } catch (error) {
       console.error('Error processing webhook update:', error);

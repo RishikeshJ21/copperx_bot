@@ -79,6 +79,10 @@ export async function startBot() {
       await bot.telegram.setWebhook(webhookUrl);
       console.log(`Webhook set: ${webhookUrl.replace(webhookSecret || '', '[SECRET]')}`);
     } else {
+      // Make sure webhook is deleted before starting long polling
+      await bot.telegram.deleteWebhook();
+      console.log('Webhook deleted, starting long polling mode');
+      
       // Use long polling - try-catch to prevent duplicate launches
       try {
         await bot.launch();
