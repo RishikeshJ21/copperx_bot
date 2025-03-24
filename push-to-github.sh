@@ -25,17 +25,19 @@ git config --global user.email "bot@copperx.io"
 if [ ! -d ".git" ]; then
   echo "📦 Initializing git repository..."
   git init
-  git remote add origin "https://$GITHUB_TOKEN@github.com/$REPO_OWNER/$REPO_NAME.git"
+  git remote add origin "https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git"
 else
   # Update remote URL with token
   echo "🔄 Updating remote URL with token..."
-  git remote set-url origin "https://$GITHUB_TOKEN@github.com/$REPO_OWNER/$REPO_NAME.git"
+  git remote set-url origin "https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git"
+  # Debug: Check remote (hide token)
+  git remote -v | sed 's/https:\/\/[^@]*@/https:\/\/****@/g'
 fi
 
 # Create .gitignore file if it doesn't exist
 if [ ! -f ".gitignore" ]; then
   echo "📝 Creating .gitignore file..."
-  cat > .gitignore << EOL
+  cat > .gitignore << END_GITIGNORE
 # Node.js
 node_modules/
 npm-debug.log
@@ -67,7 +69,7 @@ logs/
 # OS files
 .DS_Store
 Thumbs.db
-EOL
+END_GITIGNORE
 fi
 
 # Add all files to git
@@ -89,4 +91,7 @@ if [ $? -eq 0 ]; then
   echo "🔗 Repository URL: https://github.com/$REPO_OWNER/$REPO_NAME"
 else
   echo "❌ Failed to push to GitHub."
+  echo "Debug information:"
+  echo "- Make sure the GITHUB_TOKEN has the correct permissions"
+  echo "- Check if the repository exists and you have access"
 fi
