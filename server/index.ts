@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { log, setupVite, serveStatic } from './vite';
 import { registerRoutes } from './routes';
 import { config } from './bot/config';
-import { startBot } from './bot';
+import { initializeBot } from './bot';
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Set up error handling
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('Express error:', err);
+  log('Express error: ' + err.message, 'express-error');
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message || 'Something went wrong'
@@ -46,23 +46,26 @@ async function main() {
     // Set the port
     const port = parseInt(process.env.PORT || '5000', 10);
     
-    // Start the server
+    // Start the server first to ensure port is available and visible to Replit
     server.listen(port, '0.0.0.0', () => {
       log(`serving on port ${port}`);
+      
+      // Initialize the bot after the server is running
+      // This ensures Replit detects the port as open first
+      setTimeout(() => {
+        initializeBot();
+        log("Telegram bot initialized. Starting in the background...", "bot");
+        
+        // Start the bot in the background
+        import('./bot')
+          .then(botModule => {
+            botModule.startBot()
+              .then(() => log("Telegram bot started successfully!", "bot"))
+              .catch(error => log("Failed to start Telegram bot: " + error.message, "bot-error"));
+          })
+          .catch(error => log("Failed to import bot module: " + error.message, "bot-error"));
+      }, 1000); // Short delay to ensure server is recognized first
     });
-    
-    // Start the Telegram bot
-    try {
-      // Check if TELEGRAM_BOT_TOKEN exists in environment
-      if (!process.env.TELEGRAM_BOT_TOKEN) {
-        console.warn("No Telegram bot token provided. Please set TELEGRAM_BOT_TOKEN in your environment variables.");
-      } else {
-        await startBot();
-        console.log("Telegram bot started successfully!");
-      }
-    } catch (error) {
-      console.error("Failed to start Telegram bot:", error);
-    }
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
