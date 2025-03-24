@@ -1,7 +1,6 @@
 run = "node replit-start.js"
 entrypoint = "telegram-bot.ts"
 hidden = [".config", "package-lock.json"]
-modules = ["nodejs-20"]
 
 [packager]
 language = "nodejs"
