@@ -425,10 +425,10 @@ Create a `.env` file with the following variables:
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 API_BASE_URL=https://income-api.copperx.io
 DEBUG=true
-PUSHER_APP_ID=1963059
-PUSHER_KEY=dfd03c59f991f1191e95
-PUSHER_SECRET=bb3c20deb6ae8cdbe591
-PUSHER_CLUSTER=ap2
+PUSHER_APP_ID=
+PUSHER_KEY=
+PUSHER_SECRET=
+PUSHER_CLUSTER=
 ```
 
 ### Running the Bot
@@ -448,4 +448,4 @@ This project is proprietary and confidential. All rights reserved.
 ## 👥 Contact
 
 For support or inquiries, please contact:
-- Copperx Support: [Telegram Community](https://t.me/copperxcommunity/2183)
+X: https://x.com/rish_w3b
